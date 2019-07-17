@@ -27,3 +27,53 @@ class CategoryView(generic.DetailView):
         return context
 
 
+class RecipeView(generic.DetailView):
+    model = Recipe
+    context_object_name = 'recipe_view'
+    queryset = None
+    slug_field = 'recipe_name'
+    slug_url_kwarg = 'recipe_name'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(RecipeView, self).get_context_data()
+        recipe = self.object
+
+        return context
+
+
+class RecipeEditView(generic.UpdateView):
+    model = Recipe
+    context_object_name = 'recipe_edit'
+    queryset = None
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(RecipeEditView, self).get_context_data()
+        recipe = self.object
+
+        return context
+
+
+class RecipeAddView(generic.CreateView):
+    model = Recipe
+    context_object_name = 'recipe_add'
+    queryset = None
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(RecipeAddView, self).get_context_data()
+        recipe = self.object
+
+        return context
+
+
+class ShoppingListView(generic.ListView):
+    model = Recipe
+    context_object_name = 'shopping_list'
+    queryset = None
+
+
+class MealPlannerView(generic.DetailView):
+    model = Recipe
+    context_object_name = 'meal_planner'
+    queryset = None
+
+
