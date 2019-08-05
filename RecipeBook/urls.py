@@ -8,9 +8,9 @@ urlpatterns = [
     # ex: /Beef/
     path('<category_name>/', views.CategoryView.as_view(), name='category'),
     # ex: /Beef/Steak
-    path('<category_name>/<recipe_name>', views.RecipeView.as_view(), name='view_recipe'),
+    path('<category_name>/<recipe_slug>', views.RecipeView.as_view(), name='view_recipe'),
     # ex: /Beef/Steak/edit/
-    path('<category_name>/<recipe_name>/edit/', views.RecipeEditView.as_view(), name='edit_recipe'),
+    path('<category_name>/<recipe_slug>/edit/', views.RecipeEditView.as_view(), name='edit_recipe'),
     # ex: /add_recipe/
     path('add_recipe/', views.RecipeAddView.as_view(), name='add_recipe'),
     # ex: /shopping_list/

@@ -11,6 +11,7 @@ class MainView(generic.ListView):
 
 class CategoryView(generic.DetailView):
     model = Category
+    template_name = 'RecipeBook/list_page.html'
     context_object_name = 'category_recipe_list'
     queryset = None
     slug_field = 'category_name'
@@ -29,20 +30,26 @@ class CategoryView(generic.DetailView):
 
 class RecipeView(generic.DetailView):
     model = Recipe
+    template_name = 'RecipeBook/detail_page.html'
     context_object_name = 'recipe_view'
     queryset = None
     slug_field = 'recipe_name'
-    slug_url_kwarg = 'recipe_name'
+    slug_url_kwarg = 'recipe_slug'
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeView, self).get_context_data()
         recipe = self.object
+        ingredients = recipe.ingredients_list.split('\n')
+
+        context['recipe'] = recipe
+        context['ingredients'] = ingredients
 
         return context
 
 
 class RecipeEditView(generic.UpdateView):
     model = Recipe
+    template_name = 'RecipeBook/edit_page.html'
     context_object_name = 'recipe_edit'
     queryset = None
 
@@ -50,17 +57,22 @@ class RecipeEditView(generic.UpdateView):
         context = super(RecipeEditView, self).get_context_data()
         recipe = self.object
 
+        context['recipe'] = recipe
+
         return context
 
 
 class RecipeAddView(generic.CreateView):
     model = Recipe
+    template_name = 'RecipeBook/edit_page.html'
     context_object_name = 'recipe_add'
     queryset = None
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeAddView, self).get_context_data()
         recipe = self.object
+
+        context['recipe'] = recipe
 
         return context
 
@@ -75,5 +87,3 @@ class MealPlannerView(generic.DetailView):
     model = Recipe
     context_object_name = 'meal_planner'
     queryset = None
-
-
