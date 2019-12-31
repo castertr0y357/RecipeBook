@@ -1,27 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Recipe Book</title>
-</head>
-<body>
-<table>
-    <tr>
-        <td><a href="{% url 'RecipeBook:main' %}">Go Home</a></td>
-        <td><a href="{% url 'RecipeBook:add_recipe' %}">Add recipe</a></td>
-    </tr>
-</table>
-<h1>Recipe Book</h1>
-{% if categories %}
-    <ul>
-        {% for category in categories %}
-        <li>
-            <a href="{% url 'RecipeBook:category' category %}">{{ category }}</a>
-        </li>
-        {% endfor %}
-    </ul>
-{% endif %}
+{% extends "RecipeBook/base_page.html" %}
+{% block body %}
 
+    <h1>Recipe Book</h1>
 
-</body>
-</html>
+{% endblock body %}

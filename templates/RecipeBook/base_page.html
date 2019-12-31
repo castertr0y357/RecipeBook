@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <!--Javascript files-->
+    <script src="{% static "RecipeBook/jquery-3.4.1.js" %}"></script>
+    <script src="{% static "RecipeBook/jquery-3.4.1.min.js" %}"></script>
+
+    <!--CSS files-->
+    <link rel="stylesheet" href="{% static "RecipeBook/css/nav_ul.css" %}"/>
+
+    {% block head %}
+        <title>Recipe Book</title>
+    {% endblock head %}
+</head>
+<body>
+    <header>
+        <div class="menu" id="site_nav" style="border-bottom: dashed 1px #000000">
+            <ul class="nav" id="menu" style="display: inline">
+                <li><a href="{% url 'RecipeBook:main' %}">Home</a></li>
+                {# <li><a href="{% url 'RecipeBook:aboutPage' %}">About</a></li> #}
+                <li><a href="{% url 'RecipeBook:category_list' %}">Categories</a></li>
+                <li><a href="{% url 'RecipeBook:add_recipe' %}">Add Recipe</a></li>
+                <li><a href="{% url 'RecipeBook:shopping_list' %}">Shopping List</a></li>
+                <li style="float: right">
+                    <form action="" method="post" name="search" title="Search">
+                        {% csrf_token %}
+                        {{ form }}
+                        <input type="submit" value="search">
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    {% block body %}
+
+    {% endblock body %}
+</body>
+</html>

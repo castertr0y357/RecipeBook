@@ -6,10 +6,35 @@ class MainView(generic.ListView):
     model = Category
     template_name = 'RecipeBook/main_page.html'
     context_object_name = 'categories'
-    queryset = Category.objects.all().order_by('category_name')
+    queryset = None
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(MainView, self).get_context_data()
+        categories = Category.objects.all().order_by('name')
+        for category in categories:
+            category.recipes = Recipe.objects.filter(category=category)
+
+        context['categories'] = categories
+
+        return context
 
 
-class CategoryView(generic.DetailView):
+class CategoryListView(generic.ListView):
+    model = Category
+    template_name = 'RecipeBook/list_page.html'
+    context_object_name = 'category_list'
+    queryset = None
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(CategoryListView, self).get_context_data()
+        categories = Category.objects.all()
+
+        context['categories'] = categories
+
+        return context
+
+
+class CategoryDetailView(generic.DetailView):
     model = Category
     template_name = 'RecipeBook/list_page.html'
     context_object_name = 'category_recipe_list'
@@ -18,7 +43,7 @@ class CategoryView(generic.DetailView):
     slug_url_kwarg = 'category_name'
 
     def get_context_data(self, *args, **kwargs):
-        context = super(CategoryView, self).get_context_data()
+        context = super(CategoryDetailView, self).get_context_data()
         category = self.object
 
         recipes = Recipe.objects.filter(category=category)
@@ -28,7 +53,7 @@ class CategoryView(generic.DetailView):
         return context
 
 
-class RecipeView(generic.DetailView):
+class RecipeDetailView(generic.DetailView):
     model = Recipe
     template_name = 'RecipeBook/detail_page.html'
     context_object_name = 'recipe_view'
@@ -37,7 +62,7 @@ class RecipeView(generic.DetailView):
     slug_url_kwarg = 'recipe_slug'
 
     def get_context_data(self, *args, **kwargs):
-        context = super(RecipeView, self).get_context_data()
+        context = super(RecipeDetailView, self).get_context_data()
         recipe = self.object
         ingredients = recipe.ingredients_list.split('\n')
 

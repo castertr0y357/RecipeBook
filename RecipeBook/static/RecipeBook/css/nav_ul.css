@@ -1,0 +1,18 @@
+.nav, .drop {
+    margin: 0;
+    padding: 0;
+}
+
+.nav li, .drop li {
+    display: inline-block;
+    padding: 5px;
+}
+
+.drop {
+    display: none;
+}
+
+.menu {
+    padding: 5px;
+
+}

@@ -1,0 +1,13 @@
+{% extends 'RecipeBook/base_page.html' %}
+
+{% block body %}
+    {% if categories %}
+        <ul>
+            {% for category in categories %}
+            <li>
+                <a href="{% url 'RecipeBook:category' category %}">{{ category }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock body %}

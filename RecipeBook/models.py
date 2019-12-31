@@ -17,7 +17,7 @@ class Recipe(models.Model):
     serving_size = models.IntegerField()
     directions = models.TextField()
     url = models.URLField()
-    categories = models.ManyToManyField(Category, on_delete=models.DO_NOTHING, null=True, blank=True)
+    categories = models.ManyToManyField(Category, null=True, blank=True)
     slug = models.CharField(max_length=200, default="")
 
     def __str__(self):
