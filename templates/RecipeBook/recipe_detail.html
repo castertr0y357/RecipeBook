@@ -1,0 +1,39 @@
+{% extends 'RecipeBook/base_page.html' %}
+
+    {% block head %}
+        <title>{{ recipe }}</title>
+    {% endblock head %}
+
+    {% block body %}
+        {% if recipe %}
+            <h1>{{ recipe }}</h1>
+            <div id="ingredients_list">
+                <h3>Ingredients:</h3>
+                <ul>
+                    {% for ingredient in recipe.ingredients %}
+                        <li>{{ ingredient }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="directions">
+                <h3>Directions:</h3>
+                {{ recipe.directions }}
+            </div>
+            <div id="time">
+                <span><h3>Total Time required:</h3> {{ recipe.total_time }}</span>
+            </div>
+            <div id="servings">
+                <span><h3># of servings:</h3> {{ recipe.servings }}</span>
+            </div>
+            <div id="url">
+                <span><h3>Source url:</h3> {{ recipe.url }}</span>
+            </div>
+            <div id="categories">
+                {% if recipe.categories %}
+                    {% for category in recipe.categories %}
+                        <a href="{% url 'RecipeBook:category_detail' category.slug %}">{{ category }}</a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endblock body %}

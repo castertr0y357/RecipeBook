@@ -1,8 +1,55 @@
-from django.views import generic
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import Category, Recipe
+from .forms import SearchForm, RecipeAddForm
 
 
-class MainView(generic.ListView):
+# ------------------------------------- Base Views ---------------------------------------------------------------------
+class BaseListView(ListView):
+    search = SearchForm
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(BaseListView, self).get_context_data()
+
+        context['form'] = self.search
+
+        return context
+
+
+class BaseDetailView(DetailView):
+    search = SearchForm
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseDetailView, self).get_context_data()
+
+        context['form'] = self.search
+
+        return context
+
+
+class BaseUpdateView(UpdateView):
+    search = SearchForm
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseUpdateView, self).get_context_data()
+
+        context['form'] = self.search
+
+        return context
+
+
+class BaseCreateView(CreateView):
+    search = SearchForm
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseCreateView, self).get_context_data()
+
+        context['form'] = self.search
+
+        return context
+
+
+# ------------------------------------- Main and Search Views ----------------------------------------------------------
+class MainView(BaseListView):
     model = Category
     template_name = 'RecipeBook/main_page.html'
     context_object_name = 'categories'
@@ -19,9 +66,28 @@ class MainView(generic.ListView):
         return context
 
 
-class CategoryListView(generic.ListView):
+class SearchView(BaseListView):
+    model = Recipe
+    context_object_name = 'search_results'
+    queryset = None
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(SearchView, self).get_context_data()
+
+        name = self.request.GET.get('name')
+        recipes = Recipe.objects.filter(name__icontains=name).order_by('name')
+        form = self.search
+
+        context['recipes'] = recipes
+        context['form'] = form
+
+        return context
+
+
+# ------------------------------------- Category views -----------------------------------------------------------------
+class CategoryListView(BaseListView):
     model = Category
-    template_name = 'RecipeBook/list_page.html'
+    template_name = 'RecipeBook/category_list.html'
     context_object_name = 'category_list'
     queryset = None
 
@@ -34,45 +100,53 @@ class CategoryListView(generic.ListView):
         return context
 
 
-class CategoryDetailView(generic.DetailView):
+class CategoryDetailView(BaseDetailView):
     model = Category
-    template_name = 'RecipeBook/list_page.html'
+    template_name = 'RecipeBook/category_detail.html'
     context_object_name = 'category_recipe_list'
     queryset = None
-    slug_field = 'category_name'
-    slug_url_kwarg = 'category_name'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
 
     def get_context_data(self, *args, **kwargs):
         context = super(CategoryDetailView, self).get_context_data()
         category = self.object
 
-        recipes = Recipe.objects.filter(category=category)
+        category.recipes = Recipe.objects.filter(category=category)
 
-        context['recipes'] = recipes
+        context['category'] = category
 
         return context
 
 
-class RecipeDetailView(generic.DetailView):
+# ------------------------------------- Recipe views -------------------------------------------------------------------
+class RecipeListView(BaseListView):
     model = Recipe
     template_name = 'RecipeBook/detail_page.html'
+    queryset = None
+
+    # only here to provide path for Recipes, no actual view is needed
+
+
+class RecipeDetailView(BaseDetailView):
+    model = Recipe
+    template_name = 'RecipeBook/recipe_detail.html'
     context_object_name = 'recipe_view'
     queryset = None
-    slug_field = 'recipe_name'
-    slug_url_kwarg = 'recipe_slug'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeDetailView, self).get_context_data()
         recipe = self.object
-        ingredients = recipe.ingredients_list.split('\n')
+        recipe.ingredients = recipe.ingredients_list.split('\n')
 
         context['recipe'] = recipe
-        context['ingredients'] = ingredients
 
         return context
 
 
-class RecipeEditView(generic.UpdateView):
+class RecipeEditView(BaseUpdateView):
     model = Recipe
     template_name = 'RecipeBook/edit_page.html'
     context_object_name = 'recipe_edit'
@@ -81,34 +155,46 @@ class RecipeEditView(generic.UpdateView):
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeEditView, self).get_context_data()
         recipe = self.object
+        recipe.ingredients = recipe.ingredients_list.split('\n')
 
         context['recipe'] = recipe
 
         return context
 
 
-class RecipeAddView(generic.CreateView):
+class RecipeAddView(BaseCreateView):
     model = Recipe
-    template_name = 'RecipeBook/edit_page.html'
+    template_name = 'RecipeBook/add_recipe.html'
     context_object_name = 'recipe_add'
     queryset = None
+    form_class = RecipeAddForm
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeAddView, self).get_context_data()
-        recipe = self.object
 
-        context['recipe'] = recipe
+        context['recipe_add_form'] = RecipeAddForm()
 
         return context
 
 
-class ShoppingListView(generic.ListView):
+# ------------------------------------- Shopping list and Meal planner views -------------------------------------------
+class ShoppingListView(BaseListView):
     model = Recipe
     context_object_name = 'shopping_list'
     queryset = None
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(ShoppingListView, self).get_context_data()
 
-class MealPlannerView(generic.DetailView):
+        return context
+
+
+class MealPlannerView(BaseDetailView):
     model = Recipe
     context_object_name = 'meal_planner'
     queryset = None
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(MealPlannerView, self).get_context_data()
+
+        return context

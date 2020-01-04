@@ -1,0 +1,25 @@
+{% extends 'RecipeBook/base_page.html' %}
+
+    {% block head %}
+        <title>Search Results for {{ name }}</title>
+    {% endblock head %}
+
+    {% block body %}
+        {% if recipes %}
+            <h1>Search results for {{ name }}</h1>
+            <table>
+                <tr>
+                    <th>Recipe</th>
+                    <th># of Servings</th>
+                    <th>Total time</th>
+                </tr>
+                {% for recipe in category.recipes %}
+                    <tr>
+                        <td><a href="{% url 'RecipeBook:view_recipe' recipe.slug %}">{{ recipe }}</a></td>
+                        <td>{{ recipe.servings }}</td>
+                        <td>{{ recipe.total_time }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endblock body %}
