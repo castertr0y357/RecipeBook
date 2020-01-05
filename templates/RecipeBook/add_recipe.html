@@ -5,9 +5,12 @@
     {% endblock head %}
 
     {% block body %}
+        <h1>Add Recipe</h1>
         <form method="post">
             {% csrf_token %}
-            {{ recipe_add_form }}
+            <table style="text-align: left; padding-bottom: 10px">
+                {{ recipe_add_form.as_table }}
+            </table>
             <input type="submit" value="Save">
         </form>
     {% endblock body %}

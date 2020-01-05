@@ -19,5 +19,14 @@ class SearchForm(forms.Form):
 class RecipeAddForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        exclude = ['id', 'slug']
-        # fields = ['name', 'ingredients_list', 'directions', 'total_time', 'servings', 'url', 'categories']
+        fields = ['name', 'ingredients_list', 'directions', 'prep_time', 'cook_time', 'servings', 'url', 'categories']
+        widgets = {
+            'name': forms.TextInput(attrs={'size': '110'}),
+            'ingredients_list': forms.Textarea(attrs={'cols': '50', 'rows': '15'}),
+            'directions': forms.Textarea(attrs={'cols': '100', 'rows': '15'}),
+            'url': forms.URLInput(attrs={'size': '100'}),
+            'categories': forms.CheckboxSelectMultiple(),
+        }
+        labels = {
+            'ingredients_list': 'Ingredients'
+        }
