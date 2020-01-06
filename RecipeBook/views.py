@@ -1,6 +1,9 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.core.exceptions import ValidationError
+from django.shortcuts import HttpResponseRedirect, reverse
 from .models import Category, Recipe
 from .forms import SearchForm, RecipeAddForm
+from urllib.parse import urlencode
 
 
 # ------------------------------------- Base Views ---------------------------------------------------------------------
@@ -14,6 +17,19 @@ class BaseListView(ListView):
 
         return context
 
+    @staticmethod
+    def post(request):
+        if request.method == 'POST':
+            form = SearchForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['search_name']
+                base_url = reverse('RecipeBook:search_results')
+                query_string = urlencode({'name': name})
+                url = '{}?{}'.format(base_url, query_string)
+                return HttpResponseRedirect(url)
+            else:
+                raise ValidationError
+
 
 class BaseDetailView(DetailView):
     search = SearchForm
@@ -24,6 +40,19 @@ class BaseDetailView(DetailView):
         context['form'] = self.search
 
         return context
+
+    @staticmethod
+    def post(request):
+        if request.method == 'POST':
+            form = SearchForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['search_name']
+                base_url = reverse('RecipeBook:search_results')
+                query_string = urlencode({'name': name})
+                url = '{}?{}'.format(base_url, query_string)
+                return HttpResponseRedirect(url)
+            else:
+                raise ValidationError
 
 
 class BaseUpdateView(UpdateView):
@@ -36,6 +65,19 @@ class BaseUpdateView(UpdateView):
 
         return context
 
+    @staticmethod
+    def post(request):
+        if request.method == 'POST':
+            form = SearchForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['search_name']
+                base_url = reverse('RecipeBook:search_results')
+                query_string = urlencode({'name': name})
+                url = '{}?{}'.format(base_url, query_string)
+                return HttpResponseRedirect(url)
+            else:
+                raise ValidationError
+
 
 class BaseCreateView(CreateView):
     search = SearchForm
@@ -46,6 +88,19 @@ class BaseCreateView(CreateView):
         context['form'] = self.search
 
         return context
+
+    @staticmethod
+    def post(request):
+        if request.method == 'POST':
+            form = SearchForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['search_name']
+                base_url = reverse('RecipeBook:search_results')
+                query_string = urlencode({'name': name})
+                url = '{}?{}'.format(base_url, query_string)
+                return HttpResponseRedirect(url)
+            else:
+                raise ValidationError
 
 
 # ------------------------------------- Main and Search Views ----------------------------------------------------------
@@ -68,6 +123,7 @@ class MainView(BaseListView):
 
 class SearchView(BaseListView):
     model = Recipe
+    template_name = 'RecipeBook/search_results.html'
     context_object_name = 'search_results'
     queryset = None
 
@@ -172,7 +228,7 @@ class RecipeAddView(BaseCreateView):
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeAddView, self).get_context_data()
 
-        context['recipe_add_form'] = RecipeAddForm()
+        context['recipe_add_form'] = RecipeAddForm(initial={'prep_time': '', 'cook_time': '', 'servings': ''})
 
         return context
 

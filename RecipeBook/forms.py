@@ -30,3 +30,10 @@ class RecipeAddForm(forms.ModelForm):
         labels = {
             'ingredients_list': 'Ingredients'
         }
+        error_messages = {
+            'name': {
+                'max_length': "The recipe name is too long.",
+                'null': "The recipe has to have a name",
+            },
+
+        }

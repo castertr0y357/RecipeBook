@@ -24,4 +24,6 @@ urlpatterns = [
     path('shopping_list/', views.ShoppingListView.as_view(), name='shopping_list'),
     # ex: /meal_planner/
     path('meal_planner/', views.MealPlannerView.as_view(), name='meal_planner'),
+    # ex: /search_results/
+    path('search_results', views.SearchView.as_view(), name='search_results'),
 ]
