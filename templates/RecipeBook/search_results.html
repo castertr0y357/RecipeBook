@@ -13,11 +13,11 @@
                     <th># of Servings</th>
                     <th>Total time</th>
                 </tr>
-                {% for recipe in category.recipes %}
+                {% for recipe in recipes %}
                     <tr>
                         <td><a href="{% url 'RecipeBook:view_recipe' recipe.slug %}">{{ recipe }}</a></td>
                         <td>{{ recipe.servings }}</td>
-                        <td>{{ recipe.total_time }}</td>
+                        <td>{{ recipe.total_time }} minutes</td>
                     </tr>
                 {% endfor %}
             </table>

@@ -20,7 +20,8 @@
                 {{ recipe.directions }}
             </div>
             <div id="time">
-                <span><h3>Total Time required:</h3> {{ recipe.total_time }}</span>
+                <span><h3>Prep Time:</h3> {{ recipe.prep_time }}</span>
+                <span><h3>Cook Time:</h3> {{ recipe.cook_time }}</span>
             </div>
             <div id="servings">
                 <span><h3># of servings:</h3> {{ recipe.servings }}</span>
@@ -30,7 +31,7 @@
             </div>
             <div id="categories">
                 {% if recipe.categories %}
-                    {% for category in recipe.categories %}
+                    {% for category in recipe.categories.all %}
                         <a href="{% url 'RecipeBook:category_detail' category.slug %}">{{ category }}</a>
                     {% endfor %}
                 {% endif %}

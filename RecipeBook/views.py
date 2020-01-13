@@ -1,6 +1,6 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
 from django.core.exceptions import ValidationError
-from django.shortcuts import HttpResponseRedirect, reverse,redirect
+from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
 from django import db
 from django.db import connection
 from .models import Category, Recipe
@@ -20,7 +20,7 @@ class BaseListView(ListView):
         return context
 
     @staticmethod
-    def post(request):
+    def post(request, *slug):
         if request.method == 'POST':
             form = SearchForm(request.POST)
             if form.is_valid():
@@ -44,7 +44,7 @@ class BaseDetailView(DetailView):
         return context
 
     @staticmethod
-    def post(request):
+    def post(request, **slug):
         if request.method == 'POST':
             form = SearchForm(request.POST)
             if form.is_valid():
@@ -68,7 +68,7 @@ class BaseUpdateView(UpdateView):
         return context
 
     @staticmethod
-    def post(request):
+    def post(request, *slug):
         if request.method == 'POST':
             form = SearchForm(request.POST)
             if form.is_valid():
@@ -91,9 +91,11 @@ class BaseCreateView(CreateView):
 
         return context
 
+    """
     @staticmethod
     def post(request):
         if request.method == 'POST':
+            # print(True)
             form = SearchForm(request.POST)
             if form.is_valid():
                 name = form.cleaned_data['search_name']
@@ -102,8 +104,8 @@ class BaseCreateView(CreateView):
                 url = '{}?{}'.format(base_url, query_string)
                 return HttpResponseRedirect(url)
             else:
-                raise ValidationError
-
+                return HttpResponseRedirect(reverse('RecipeBook:main'))
+    """
 
 # ------------------------------------- Main and Search Views ----------------------------------------------------------
 class MainView(BaseListView):
@@ -134,6 +136,8 @@ class SearchView(BaseListView):
 
         name = self.request.GET.get('name')
         recipes = Recipe.objects.filter(name__icontains=name).order_by('name')
+        for recipe in recipes:
+            recipe.total_time = recipe.cook_time + recipe.prep_time
         form = self.search
 
         context['name'] = name
@@ -235,43 +239,57 @@ class RecipeAddView(BaseCreateView):
 
         return context
 
-    @staticmethod
-    def add_recipe(request):
+    def post(self, request):
         if request.method == 'POST':
-            form = RecipeAddForm(request.POST)
-            if form.is_valid():
-                name = form.cleaned_data['name']
-                ingredients_list = form.cleaned_data['ingredients_list']
-                directions = form.cleaned_data['directions']
-                servings = form.cleaned_data['servings']
-                prep_time = form.cleaned_data['prep_time']
-                cook_time = form.cleaned_data['cook_time']
-                url = form.cleaned_data['url']
+            search_form = SearchForm(request.POST)
+            add_form = RecipeAddForm(request.POST)
+            if add_form.is_valid():
+                name = add_form.cleaned_data['name']
+                ingredients_list = add_form.cleaned_data['ingredients_list']
+                directions = add_form.cleaned_data['directions']
+                servings = add_form.cleaned_data['servings']
+                prep_time = add_form.cleaned_data['prep_time']
+                cook_time = add_form.cleaned_data['cook_time']
+                url = add_form.cleaned_data['url']
+                print(name, ingredients_list, directions, servings, prep_time, cook_time, url)
 
-                while True:
-                    try:
-                        recipe = Recipe.objects.create(name=name,
-                                                       ingredients_list=ingredients_list,
-                                                       directions=directions,
-                                                       servings=servings,
-                                                       prep_time=prep_time,
-                                                       cook_time=cook_time,
-                                                       url=url)
-                        break
-                    except db.utils.OperationalError:
-                        print("DB is locked")
+                recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, url)
 
-                while True:
-                    try:
-                        recipe.slug = name + "-" + str(recipe.id)
-                        recipe.save()
-                        return redirect('RecipeBook:view_recipe', slug=recipe.slug)
-
-                    except db.utils.OperationalError:
-                        print("DB is locked")
-
+                return redirect('RecipeBook:view_recipe', slug=recipe.slug)
+            elif search_form.is_valid():
+                name = search_form.cleaned_data['search_name']
+                base_url = reverse('RecipeBook:search_results')
+                query_string = urlencode({'name': name})
+                url = '{}?{}'.format(base_url, query_string)
+                return HttpResponseRedirect(url)
             else:
-                raise ValidationError
+                return render('RecipeBook:add_recipe', {'form': add_form})
+
+    @staticmethod
+    def create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, url):
+        while True:
+            try:
+                recipe = Recipe.objects.create(name=name,
+                                               ingredients_list=ingredients_list,
+                                               directions=directions,
+                                               servings=servings,
+                                               prep_time=prep_time,
+                                               cook_time=cook_time,
+                                               url=url)
+                break
+            except db.utils.OperationalError:
+                print("DB is locked")
+
+        while True:
+            try:
+                recipe.slug = name + "-" + str(recipe.id)
+                recipe.save()
+                break
+
+            except db.utils.OperationalError:
+                print("DB is locked")
+
+        return recipe
 
 
 # ------------------------------------- Shopping list and Meal planner views -------------------------------------------
