@@ -81,11 +81,11 @@ class BaseUpdateView(UpdateView):
                 raise ValidationError
 
 
-class BaseCreateView(CreateView):
+class BaseFormView(FormView):
     search = SearchForm
 
     def get_context_data(self, **kwargs):
-        context = super(BaseCreateView, self).get_context_data()
+        context = super(BaseFormView, self).get_context_data()
 
         context['form'] = self.search
 
@@ -225,7 +225,7 @@ class RecipeEditView(BaseUpdateView):
         return context
 
 
-class RecipeAddView(BaseCreateView):
+class RecipeAddView(BaseFormView):
     model = Recipe
     template_name = 'RecipeBook/add_recipe.html'
     context_object_name = 'recipe_add'
@@ -244,16 +244,17 @@ class RecipeAddView(BaseCreateView):
             search_form = SearchForm(request.POST)
             add_form = RecipeAddForm(request.POST)
             if add_form.is_valid():
-                name = add_form.cleaned_data['name']
+                name = add_form.cleaned_data['recipe_name']
                 ingredients_list = add_form.cleaned_data['ingredients_list']
                 directions = add_form.cleaned_data['directions']
                 servings = add_form.cleaned_data['servings']
                 prep_time = add_form.cleaned_data['prep_time']
                 cook_time = add_form.cleaned_data['cook_time']
-                url = add_form.cleaned_data['url']
-                print(name, ingredients_list, directions, servings, prep_time, cook_time, url)
+                source = add_form.cleaned_data['source']
+                categories = add_form.cleaned_data['category_input']
+                print(name, ingredients_list, directions, servings, prep_time, cook_time, source, categories)
 
-                recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, url)
+                recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source)
 
                 return redirect('RecipeBook:view_recipe', slug=recipe.slug)
             elif search_form.is_valid():
@@ -266,7 +267,7 @@ class RecipeAddView(BaseCreateView):
                 return render('RecipeBook:add_recipe', {'form': add_form})
 
     @staticmethod
-    def create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, url):
+    def create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source):
         while True:
             try:
                 recipe = Recipe.objects.create(name=name,
@@ -275,7 +276,7 @@ class RecipeAddView(BaseCreateView):
                                                servings=servings,
                                                prep_time=prep_time,
                                                cook_time=cook_time,
-                                               url=url)
+                                               source=source)
                 break
             except db.utils.OperationalError:
                 print("DB is locked")

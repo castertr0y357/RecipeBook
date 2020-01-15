@@ -18,7 +18,7 @@ class Recipe(models.Model):
     prep_time = models.IntegerField(default=0, null=True, blank=True)
     cook_time = models.IntegerField(default=0, null=True, blank=True)
     directions = models.TextField(default="")
-    url = models.CharField(max_length=100, default="", null=True, blank=True)
+    source = models.CharField(max_length=100, default="", null=True, blank=True)
     categories = models.ManyToManyField(Category, blank=True)
     slug = models.CharField(max_length=200, default="")
 
