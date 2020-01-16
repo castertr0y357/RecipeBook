@@ -315,6 +315,12 @@ class RecipeAddView(BaseFormView):
 
     @staticmethod
     def create_category(name):
+        # strip extra spaces out of beginning and end of category name
+        while name[0] == " ":
+            name[0] = ""
+        while name[-1] == " ":
+            name[-1] = ""
+
         while True:
             try:
                 db_category = Category.objects.create(name=name)
