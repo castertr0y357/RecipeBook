@@ -6,7 +6,7 @@
         <ul>
             {% for category in categories %}
             <li>
-                <a href="{% url 'RecipeBook:category' category %}">{{ category }}</a>
+                <a href="{% url 'RecipeBook:category_detail' category %}">{{ category }}</a>
             </li>
             {% endfor %}
         </ul>

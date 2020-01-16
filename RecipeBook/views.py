@@ -118,7 +118,7 @@ class MainView(BaseListView):
         context = super(MainView, self).get_context_data()
         categories = Category.objects.all().order_by('name')
         for category in categories:
-            category.recipes = Recipe.objects.filter(category=category)
+            category.recipes = Recipe.objects.filter(categories=category)
 
         context['categories'] = categories
 
@@ -175,7 +175,7 @@ class CategoryDetailView(BaseDetailView):
         context = super(CategoryDetailView, self).get_context_data()
         category = self.object
 
-        category.recipes = Recipe.objects.filter(category=category)
+        category.recipes = Recipe.objects.filter(categories=category)
 
         context['category'] = category
 
@@ -252,9 +252,18 @@ class RecipeAddView(BaseFormView):
                 cook_time = add_form.cleaned_data['cook_time']
                 source = add_form.cleaned_data['source']
                 categories = add_form.cleaned_data['category_input']
+                categories_list = []
+
+                if ',' in categories:
+                    categories_parsed = categories.split(',')
+                    for category in categories_parsed:
+                        categories_list.append(category)
+                else:
+                    categories_list.append(categories)
                 print(name, ingredients_list, directions, servings, prep_time, cook_time, source, categories)
 
-                recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source)
+                recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
+                                            categories_list)
 
                 return redirect('RecipeBook:view_recipe', slug=recipe.slug)
             elif search_form.is_valid():
@@ -266,8 +275,7 @@ class RecipeAddView(BaseFormView):
             else:
                 return render('RecipeBook:add_recipe', {'form': add_form})
 
-    @staticmethod
-    def create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source):
+    def create_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, categories):
         while True:
             try:
                 recipe = Recipe.objects.create(name=name,
@@ -290,7 +298,39 @@ class RecipeAddView(BaseFormView):
             except db.utils.OperationalError:
                 print("DB is locked")
 
+        # clean up categories
+        recipe_categories = recipe.categories.all()
+        for db_category in recipe_categories:
+            recipe_categories.remove(db_category)
+
+        for category in categories:
+            try:
+                db_category = Category.objects.get(name=category)
+                recipe.categories.add(db_category)
+            except Category.DoesNotExist:
+                db_category = self.create_category(category)
+                recipe.categories.add(db_category)
+
         return recipe
+
+    @staticmethod
+    def create_category(name):
+        while True:
+            try:
+                db_category = Category.objects.create(name=name)
+                break
+            except db.utils.OperationalError:
+                print("DB is locked")
+
+        db_category.slug = name + "-" + str(db_category.id)
+
+        while True:
+            try:
+                db_category.save()
+                break
+            except db.utils.OperationalError:
+                print("DB is locked")
+        return db_category
 
 
 # ------------------------------------- Shopping list and Meal planner views -------------------------------------------
