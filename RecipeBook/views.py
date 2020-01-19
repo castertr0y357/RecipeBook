@@ -157,6 +157,8 @@ class CategoryListView(BaseListView):
     def get_context_data(self, *args, **kwargs):
         context = super(CategoryListView, self).get_context_data()
         categories = Category.objects.all()
+        for category in categories:
+            category.recipes = Recipe.objects.filter(categories=category)
 
         context['categories'] = categories
 

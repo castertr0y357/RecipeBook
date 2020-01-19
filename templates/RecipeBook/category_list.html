@@ -3,12 +3,17 @@
 {% block body %}
     <h1>Categories</h1>
     {% if categories %}
-        <ul>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th># of Recipes</th>
+            </tr>
             {% for category in categories %}
-            <li>
-                <a href="{% url 'RecipeBook:category_detail' category %}">{{ category }}</a>
-            </li>
+                <tr>
+                    <td><a href="{% url 'RecipeBook:category_detail' category.slug %}">{{ category }}</a></td>
+                    <td>{{ category.recipes.count }}</td>
+                </tr>
             {% endfor %}
-        </ul>
+        </table>
     {% endif %}
 {% endblock body %}

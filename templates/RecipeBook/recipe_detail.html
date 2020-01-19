@@ -31,8 +31,9 @@
             </div>
             <div id="categories">
                 {% if recipe.categories %}
+                    <h3>Categories:</h3>
                     {% for category in recipe.categories.all %}
-                        <a href="{% url 'RecipeBook:category_detail' category.slug %}">{{ category }}</a>
+                        <a href="{% url 'RecipeBook:category_detail' category.slug %}">{{ category }} </a>
                     {% endfor %}
                 {% endif %}
             </div>
