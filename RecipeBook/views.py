@@ -57,7 +57,7 @@ class BaseDetailView(DetailView):
                 raise ValidationError
 
 
-class BaseUpdateView(UpdateView):
+class BaseUpdateView(FormView):
     search = SearchForm
 
     def get_context_data(self, **kwargs):
@@ -106,6 +106,7 @@ class BaseFormView(FormView):
             else:
                 return HttpResponseRedirect(reverse('RecipeBook:main'))
     """
+
 
 # ------------------------------------- Main and Search Views ----------------------------------------------------------
 class MainView(BaseListView):
@@ -203,18 +204,19 @@ class RecipeDetailView(BaseDetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeDetailView, self).get_context_data()
-        recipe = self.object
+        recipe = self.get_object()
         recipe.ingredients = recipe.ingredients_list.split('\n')
 
         context['recipe'] = recipe
+        print(recipe.slug)
 
         return context
 
 
-class RecipeEditView(BaseUpdateView):
+class RecipeEditView(BaseDetailView):
     model = Recipe
     template_name = 'RecipeBook/edit_recipe.html'
-    context_object_name = 'recipe_edit'
+    # context_object_name = 'recipe_edit'
     queryset = None
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
@@ -222,18 +224,17 @@ class RecipeEditView(BaseUpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeEditView, self).get_context_data()
-        recipe = self.object
+        recipe = self.get_object()
         print(recipe.name)
-        recipe.ingredients = recipe.ingredients_list.split('\n')
         recipe.categories_list = ""
         categories = Category.objects.filter(recipe=recipe)
         for category in categories:
-            if category != categories[-1]:
-                recipe.categories_list += (category + ", ")
+            if category != categories[categories.__len__() - 1]:
+                recipe.categories_list += (category.name + ", ")
             else:
-                recipe.categories_list += category
+                recipe.categories_list += category.name
 
-        recipe_edit_form = RecipeForm(initial={'name': recipe.name, 'ingredients_list': recipe.ingredients,
+        recipe_edit_form = RecipeForm(initial={'recipe_name': recipe.name, 'ingredients_list': recipe.ingredients_list,
                                                'directions': recipe.directions, 'prep_time': recipe.prep_time,
                                                'cook_time': recipe.cook_time, 'servings': recipe.servings,
                                                'source': recipe.source, 'category_input': recipe.categories_list})
@@ -242,7 +243,7 @@ class RecipeEditView(BaseUpdateView):
 
         return context
 
-    def post(self, request):
+    def post(self, request, **slug):
         if request.method == 'POST':
             search_form = SearchForm(request.POST)
             edit_form = RecipeForm(request.POST)
@@ -278,7 +279,7 @@ class RecipeEditView(BaseUpdateView):
                 return render('RecipeBook:edit_recipe', {'form': edit_form})
 
     def update_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, categories):
-        recipe = self.object
+        recipe = self.get_object()
         recipe.name = name
         recipe.ingredients_list = ingredients_list
         recipe.directions = directions
@@ -299,7 +300,7 @@ class RecipeEditView(BaseUpdateView):
         # clean up categories
         recipe_categories = recipe.categories.all()
         for db_category in recipe_categories:
-            recipe_categories.remove(db_category)
+            recipe.categories.remove(db_category)
 
         for category in categories:
             try:
@@ -314,10 +315,7 @@ class RecipeEditView(BaseUpdateView):
     @staticmethod
     def create_category(name):
         # strip extra spaces out of beginning and end of category name
-        while name[0] == " ":
-            name[0] = ""
-        while name[-1] == " ":
-            name[-1] = ""
+        name = name.strip()
 
         while True:
             try:
@@ -372,7 +370,7 @@ class RecipeAddView(BaseFormView):
                         categories_list.append(category)
                 else:
                     categories_list.append(categories)
-                print(name, ingredients_list, directions, servings, prep_time, cook_time, source, categories)
+                print(categories_list)
 
                 recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
                                             categories_list)
@@ -428,10 +426,7 @@ class RecipeAddView(BaseFormView):
     @staticmethod
     def create_category(name):
         # strip extra spaces out of beginning and end of category name
-        while name[0] == " ":
-            name[0] = ""
-        while name[-1] == " ":
-            name[-1] = ""
+        name = name.strip()
 
         while True:
             try:
