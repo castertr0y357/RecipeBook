@@ -6,6 +6,7 @@
 
     {% block body %}
         {% if recipe %}
+            <a href="{% url 'RecipeBook:edit_recipe' recipe.slug %}" style="float: right">Edit Recipe</a>
             <h1>{{ recipe }}</h1>
             <div id="ingredients_list">
                 <h3>Ingredients:</h3>

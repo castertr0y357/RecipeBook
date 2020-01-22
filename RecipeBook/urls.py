@@ -16,8 +16,8 @@ urlpatterns = [
     path('Recipes/<slug>/', views.RecipeDetailView.as_view(), name='view_recipe'),
     path('Recipes/<path:slug>/', views.RecipeDetailView.as_view(), name='view_recipe'),
     # ex: /Categories/Beef/Steak/edit/
-    path('Recipes/<slug>/edit/', views.RecipeEditView.as_view(), name='edit_recipe'),
-    path('Recipes/<path:slug>/edit/', views.RecipeEditView.as_view(), name="edit_recipe"),
+    path('Recipes/edit/<slug>/', views.RecipeEditView.as_view(), name='edit_recipe'),
+    path('Recipes/edit/<path:slug>/', views.RecipeEditView.as_view(), name='edit_recipe'),
     # ex: /add_recipe/
     path('add_recipe/', views.RecipeAddView.as_view(), name='add_recipe'),
     # ex: /shopping_list/

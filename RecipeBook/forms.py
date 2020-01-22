@@ -16,7 +16,7 @@ class SearchForm(forms.Form):
         return name
 
 
-class RecipeAddForm(forms.Form):
+class RecipeForm(forms.Form):
     recipe_name = forms.CharField(widget=forms.TextInput(attrs={'size': 110}),
                                   label='Name',
                                   required=True,

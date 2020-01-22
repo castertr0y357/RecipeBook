@@ -12,12 +12,14 @@
                     <th>Recipe</th>
                     <th># of Servings</th>
                     <th>Total time</th>
+                    <th>Source</th>
                 </tr>
                 {% for recipe in recipes %}
                     <tr>
                         <td><a href="{% url 'RecipeBook:view_recipe' recipe.slug %}">{{ recipe }}</a></td>
                         <td>{{ recipe.servings }}</td>
                         <td>{{ recipe.total_time }} minutes</td>
+                        <td>{{ recipe.source }}</td>
                     </tr>
                 {% endfor %}
             </table>

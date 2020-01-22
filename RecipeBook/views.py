@@ -4,7 +4,7 @@ from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
 from django import db
 from django.db import connection
 from .models import Category, Recipe
-from .forms import SearchForm, RecipeAddForm
+from .forms import SearchForm, RecipeForm
 from urllib.parse import urlencode
 
 
@@ -187,7 +187,7 @@ class CategoryDetailView(BaseDetailView):
 # ------------------------------------- Recipe views -------------------------------------------------------------------
 class RecipeListView(BaseListView):
     model = Recipe
-    template_name = 'RecipeBook/detail_page.html'
+    template_name = 'RecipeBook/recipe_list.html'
     queryset = None
 
     # only here to provide path for Recipes, no actual view is needed
@@ -213,18 +213,128 @@ class RecipeDetailView(BaseDetailView):
 
 class RecipeEditView(BaseUpdateView):
     model = Recipe
-    template_name = 'RecipeBook/edit_page.html'
+    template_name = 'RecipeBook/edit_recipe.html'
     context_object_name = 'recipe_edit'
     queryset = None
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+    form_class = RecipeForm
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeEditView, self).get_context_data()
         recipe = self.object
+        print(recipe.name)
         recipe.ingredients = recipe.ingredients_list.split('\n')
+        recipe.categories_list = ""
+        categories = Category.objects.filter(recipe=recipe)
+        for category in categories:
+            if category != categories[-1]:
+                recipe.categories_list += (category + ", ")
+            else:
+                recipe.categories_list += category
 
+        recipe_edit_form = RecipeForm(initial={'name': recipe.name, 'ingredients_list': recipe.ingredients,
+                                               'directions': recipe.directions, 'prep_time': recipe.prep_time,
+                                               'cook_time': recipe.cook_time, 'servings': recipe.servings,
+                                               'source': recipe.source, 'category_input': recipe.categories_list})
         context['recipe'] = recipe
+        context['recipe_edit_form'] = recipe_edit_form
 
         return context
+
+    def post(self, request):
+        if request.method == 'POST':
+            search_form = SearchForm(request.POST)
+            edit_form = RecipeForm(request.POST)
+            if edit_form.is_valid():
+                name = edit_form.cleaned_data['recipe_name']
+                ingredients_list = edit_form.cleaned_data['ingredients_list']
+                directions = edit_form.cleaned_data['directions']
+                servings = edit_form.cleaned_data['servings']
+                prep_time = edit_form.cleaned_data['prep_time']
+                cook_time = edit_form.cleaned_data['cook_time']
+                source = edit_form.cleaned_data['source']
+                categories = edit_form.cleaned_data['category_input']
+                categories_list = []
+
+                if ',' in categories:
+                    categories_parsed = categories.split(',')
+                    for category in categories_parsed:
+                        categories_list.append(category)
+                else:
+                    categories_list.append(categories)
+
+                recipe = self.update_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
+                                            categories_list)
+
+                return redirect('RecipeBook:view_recipe', slug=recipe.slug)
+            elif search_form.is_valid():
+                name = search_form.cleaned_data['search_name']
+                base_url = reverse('RecipeBook:search_results')
+                query_string = urlencode({'name': name})
+                url = '{}?{}'.format(base_url, query_string)
+                return HttpResponseRedirect(url)
+            else:
+                return render('RecipeBook:edit_recipe', {'form': edit_form})
+
+    def update_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, categories):
+        recipe = self.object
+        recipe.name = name
+        recipe.ingredients_list = ingredients_list
+        recipe.directions = directions
+        recipe.servings = servings
+        recipe.prep_time = prep_time
+        recipe.cook_time = cook_time
+        recipe.source = source
+        recipe.slug = name + "-" + str(recipe.id)
+
+        while True:
+            try:
+                recipe.save()
+                break
+
+            except db.utils.OperationalError:
+                print("DB is locked")
+
+        # clean up categories
+        recipe_categories = recipe.categories.all()
+        for db_category in recipe_categories:
+            recipe_categories.remove(db_category)
+
+        for category in categories:
+            try:
+                db_category = Category.objects.get(name=category)
+                recipe.categories.add(db_category)
+            except Category.DoesNotExist:
+                db_category = self.create_category(category)
+                recipe.categories.add(db_category)
+
+        return recipe
+
+    @staticmethod
+    def create_category(name):
+        # strip extra spaces out of beginning and end of category name
+        while name[0] == " ":
+            name[0] = ""
+        while name[-1] == " ":
+            name[-1] = ""
+
+        while True:
+            try:
+                db_category = Category.objects.create(name=name)
+                break
+            except db.utils.OperationalError:
+                print("DB is locked")
+
+        db_category.slug = name + "-" + str(db_category.id)
+
+        while True:
+            try:
+                db_category.save()
+                break
+            except db.utils.OperationalError:
+                print("DB is locked")
+        return db_category
 
 
 class RecipeAddView(BaseFormView):
@@ -232,19 +342,19 @@ class RecipeAddView(BaseFormView):
     template_name = 'RecipeBook/add_recipe.html'
     context_object_name = 'recipe_add'
     queryset = None
-    form_class = RecipeAddForm
+    form_class = RecipeForm
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeAddView, self).get_context_data()
 
-        context['recipe_add_form'] = RecipeAddForm(initial={'prep_time': '', 'cook_time': '', 'servings': ''})
+        context['recipe_add_form'] = RecipeForm(initial={'prep_time': '', 'cook_time': '', 'servings': ''})
 
         return context
 
     def post(self, request):
         if request.method == 'POST':
             search_form = SearchForm(request.POST)
-            add_form = RecipeAddForm(request.POST)
+            add_form = RecipeForm(request.POST)
             if add_form.is_valid():
                 name = add_form.cleaned_data['recipe_name']
                 ingredients_list = add_form.cleaned_data['ingredients_list']

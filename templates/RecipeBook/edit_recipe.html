@@ -1,0 +1,16 @@
+{% extends 'RecipeBook/base_page.html' %}
+
+    {% block head %}
+        <title>Edit - {{ recipe }}</title>
+    {% endblock head %}
+
+    {% block body %}
+        <h1>Edit {{ recipe }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            <table style="text-align: left; padding-bottom: 10px">
+                {{ recipe_edit_form.as_table }}
+            </table>
+            <input type="submit" value="Save">
+        </form>
+    {% endblock body %}
