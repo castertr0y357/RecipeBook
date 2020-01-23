@@ -117,11 +117,13 @@ class MainView(BaseListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(MainView, self).get_context_data()
-        categories = Category.objects.all().order_by('name')
-        for category in categories:
-            category.recipes = Recipe.objects.filter(categories=category)
+        categories = Category.objects.all()
+        categories.recent = categories[categories.count() - 1]
+        recipes = Recipe.objects.all()
+        recipes.recent = recipes[recipes.count() - 1]
 
         context['categories'] = categories
+        context['recipes'] = recipes
 
         return context
 
@@ -179,6 +181,8 @@ class CategoryDetailView(BaseDetailView):
         category = self.object
 
         category.recipes = Recipe.objects.filter(categories=category)
+        for recipe in category.recipes:
+            recipe.total_time = recipe.prep_time + recipe.cook_time
 
         context['category'] = category
 
@@ -303,6 +307,7 @@ class RecipeEditView(BaseDetailView):
             recipe.categories.remove(db_category)
 
         for category in categories:
+            category = category.strip()
             try:
                 db_category = Category.objects.get(name=category)
                 recipe.categories.add(db_category)
