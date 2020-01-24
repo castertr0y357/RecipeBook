@@ -1,8 +1,7 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
+from django.views.generic import ListView, DetailView, FormView
 from django.core.exceptions import ValidationError
 from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
 from django import db
-from django.db import connection
 from .models import Category, Recipe
 from .forms import SearchForm, RecipeForm
 from urllib.parse import urlencode
@@ -14,9 +13,7 @@ class BaseListView(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(BaseListView, self).get_context_data()
-
         context['form'] = self.search
-
         return context
 
     @staticmethod
@@ -38,9 +35,7 @@ class BaseDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(BaseDetailView, self).get_context_data()
-
         context['form'] = self.search
-
         return context
 
     @staticmethod
@@ -62,9 +57,7 @@ class BaseUpdateView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(BaseUpdateView, self).get_context_data()
-
         context['form'] = self.search
-
         return context
 
     @staticmethod
@@ -86,26 +79,8 @@ class BaseFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(BaseFormView, self).get_context_data()
-
         context['form'] = self.search
-
         return context
-
-    """
-    @staticmethod
-    def post(request):
-        if request.method == 'POST':
-            # print(True)
-            form = SearchForm(request.POST)
-            if form.is_valid():
-                name = form.cleaned_data['search_name']
-                base_url = reverse('RecipeBook:search_results')
-                query_string = urlencode({'name': name})
-                url = '{}?{}'.format(base_url, query_string)
-                return HttpResponseRedirect(url)
-            else:
-                return HttpResponseRedirect(reverse('RecipeBook:main'))
-    """
 
 
 # ------------------------------------- Main and Search Views ----------------------------------------------------------
@@ -124,7 +99,6 @@ class MainView(BaseListView):
 
         context['categories'] = categories
         context['recipes'] = recipes
-
         return context
 
 
@@ -136,7 +110,6 @@ class SearchView(BaseListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(SearchView, self).get_context_data()
-
         name = self.request.GET.get('name')
         recipes = Recipe.objects.filter(name__icontains=name).order_by('name')
         for recipe in recipes:
@@ -146,7 +119,6 @@ class SearchView(BaseListView):
         context['name'] = name
         context['recipes'] = recipes
         context['form'] = form
-
         return context
 
 
@@ -164,7 +136,6 @@ class CategoryListView(BaseListView):
             category.recipes = Recipe.objects.filter(categories=category)
 
         context['categories'] = categories
-
         return context
 
 
@@ -179,13 +150,11 @@ class CategoryDetailView(BaseDetailView):
     def get_context_data(self, *args, **kwargs):
         context = super(CategoryDetailView, self).get_context_data()
         category = self.object
-
         category.recipes = Recipe.objects.filter(categories=category)
         for recipe in category.recipes:
             recipe.total_time = recipe.prep_time + recipe.cook_time
 
         context['category'] = category
-
         return context
 
 
@@ -194,7 +163,6 @@ class RecipeListView(BaseListView):
     model = Recipe
     template_name = 'RecipeBook/recipe_list.html'
     queryset = None
-
     # only here to provide path for Recipes, no actual view is needed
 
 
@@ -212,15 +180,12 @@ class RecipeDetailView(BaseDetailView):
         recipe.ingredients = recipe.ingredients_list.split('\n')
 
         context['recipe'] = recipe
-        print(recipe.slug)
-
         return context
 
 
 class RecipeEditView(BaseDetailView):
     model = Recipe
     template_name = 'RecipeBook/edit_recipe.html'
-    # context_object_name = 'recipe_edit'
     queryset = None
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
@@ -237,14 +202,12 @@ class RecipeEditView(BaseDetailView):
                 recipe.categories_list += (category.name + ", ")
             else:
                 recipe.categories_list += category.name
-
         recipe_edit_form = RecipeForm(initial={'recipe_name': recipe.name, 'ingredients_list': recipe.ingredients_list,
                                                'directions': recipe.directions, 'prep_time': recipe.prep_time,
                                                'cook_time': recipe.cook_time, 'servings': recipe.servings,
                                                'source': recipe.source, 'category_input': recipe.categories_list})
         context['recipe'] = recipe
         context['recipe_edit_form'] = recipe_edit_form
-
         return context
 
     def post(self, request, **slug):
@@ -271,7 +234,6 @@ class RecipeEditView(BaseDetailView):
 
                 recipe = self.update_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
                                             categories_list)
-
                 return redirect('RecipeBook:view_recipe', slug=recipe.slug)
             elif search_form.is_valid():
                 name = search_form.cleaned_data['search_name']
@@ -297,10 +259,8 @@ class RecipeEditView(BaseDetailView):
             try:
                 recipe.save()
                 break
-
             except db.utils.OperationalError:
                 print("DB is locked")
-
         # clean up categories
         recipe_categories = recipe.categories.all()
         for db_category in recipe_categories:
@@ -319,7 +279,6 @@ class RecipeEditView(BaseDetailView):
 
     @staticmethod
     def create_category(name):
-        # strip extra spaces out of beginning and end of category name
         name = name.strip()
 
         while True:
