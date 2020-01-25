@@ -93,9 +93,11 @@ class MainView(BaseListView):
     def get_context_data(self, *args, **kwargs):
         context = super(MainView, self).get_context_data()
         categories = Category.objects.all()
-        categories.recent = categories[categories.count() - 1]
+        if categories.count() > 0:
+            categories.recent = categories[categories.count() - 1]
         recipes = Recipe.objects.all()
-        recipes.recent = recipes[recipes.count() - 1]
+        if recipes.count() > 0:
+            recipes.recent = recipes[recipes.count() - 1]
 
         context['categories'] = categories
         context['recipes'] = recipes
