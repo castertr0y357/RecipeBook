@@ -12,13 +12,17 @@
             <tr>
                 <td class="stats">
                     <h2>Categories: {{ categories.count }} total categories</h2>
-                    <h4>Latest Category: <a href="{% url 'RecipeBook:category_detail' categories.recent.slug %}">{{ categories.recent }}</a></h4>
+                    {% if categories.count > 0 %}
+                        <h4>Latest Category: <a href="{% url 'RecipeBook:category_detail' categories.recent.slug %}">{{ categories.recent }}</a></h4>
+                    {% endif %}
                 </td>
             </tr>
             <tr>
                 <td class="stats">
                     <h2>Recipes: {{ recipes.count }} total recipes</h2>
-                    <h4>Latest Recipe: <a href="{% url 'RecipeBook:view_recipe' recipes.recent.slug %}">{{ recipes.recent }}</a></h4>
+                    {% if recipes.count > 0 %}
+                        <h4>Latest Recipe: <a href="{% url 'RecipeBook:view_recipe' recipes.recent.slug %}">{{ recipes.recent }}</a></h4>
+                    {% endif %}
                 </td>
             </tr>
         </table>
