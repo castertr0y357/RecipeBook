@@ -281,11 +281,10 @@ class RecipeEditView(BaseDetailView):
 
     @staticmethod
     def create_category(name):
-        name = name.strip()
 
         while True:
             try:
-                db_category = Category.objects.create(name=name)
+                db_category = Category.objects.create(name=name.strip().capitalize())
                 break
             except db.utils.OperationalError:
                 print("DB is locked")
@@ -391,12 +390,10 @@ class RecipeAddView(BaseFormView):
 
     @staticmethod
     def create_category(name):
-        # strip extra spaces out of beginning and end of category name
-        name = name.strip()
 
         while True:
             try:
-                db_category = Category.objects.create(name=name)
+                db_category = Category.objects.create(name=name.strip().capitalize())
                 break
             except db.utils.OperationalError:
                 print("DB is locked")
