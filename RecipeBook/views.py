@@ -270,7 +270,7 @@ class RecipeEditView(BaseDetailView):
 
         for category in categories:
             try:
-                db_category = Category.objects.get(name__iequals=category.strip())
+                db_category = Category.objects.get(name=category.strip().capitalize())
                 recipe.categories.add(db_category)
             except Category.DoesNotExist:
                 db_category = self.create_category(category)
@@ -378,7 +378,7 @@ class RecipeAddView(BaseFormView):
 
         for category in categories:
             try:
-                db_category = Category.objects.get(name__iequals=category.strip())
+                db_category = Category.objects.get(name=category.strip().capitalize())
                 recipe.categories.add(db_category)
             except Category.DoesNotExist:
                 db_category = self.create_category(category)
