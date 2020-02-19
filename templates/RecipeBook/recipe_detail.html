@@ -18,7 +18,9 @@
             </div>
             <div id="directions">
                 <h3>Directions:</h3>
-                {{ recipe.directions }}
+                {% for direction in recipe.directions %}
+                    <p>{{ direction }}</p>
+                {% endfor %}
             </div>
             <div id="time">
                 <span><h3>Prep Time:</h3> {{ recipe.prep_time }} minutes</span>

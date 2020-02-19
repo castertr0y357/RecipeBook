@@ -180,6 +180,7 @@ class RecipeDetailView(BaseDetailView):
         context = super(RecipeDetailView, self).get_context_data()
         recipe = self.get_object()
         recipe.ingredients = recipe.ingredients_list.split('\n')
+        recipe.directions = recipe.directions.split('\n')
 
         context['recipe'] = recipe
         return context
@@ -390,7 +391,6 @@ class RecipeAddView(BaseFormView):
 
     @staticmethod
     def create_category(name):
-
         while True:
             try:
                 db_category = Category.objects.create(name=name.strip().capitalize())
