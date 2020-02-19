@@ -182,6 +182,9 @@ class RecipeDetailView(BaseDetailView):
         recipe.ingredients = recipe.ingredients_list.split('\n')
         recipe.directions = recipe.directions.split('\n')
 
+        if "http" in str(recipe.source):
+            recipe.link = recipe.source
+
         context['recipe'] = recipe
         return context
 
