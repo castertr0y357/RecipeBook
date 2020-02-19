@@ -22,27 +22,31 @@
                     <p>{{ direction }}</p>
                 {% endfor %}
             </div>
-            <div id="time">
-                <h3>Prep Time:</h3> {{ recipe.prep_time }} minutes
-                <h3>Cook Time:</h3> {{ recipe.cook_time }} minutes
+            <div id="prep_time">
+                <p><h3 style="display: inline">Prep Time:</h3> {{ recipe.prep_time }} minutes</p>
+            </div>
+            <div id="cook_time">
+                <p><h3 style="display: inline">Cook Time:</h3> {{ recipe.cook_time }} minutes</p>
             </div>
             <div id="servings">
-                <span><h3># of servings:</h3> {{ recipe.servings }} servings</span>
+                <p><h3 style="display: inline"># of servings:</h3> {{ recipe.servings }} servings</p>
             </div>
             <div id="source">
-                <h3>Source:</h3>
+                <p><h3 style="display: inline">Source:</h3>
                 {% if recipe.link %}
                     <a href="{{ recipe.link }}">{{ recipe.link }}</a>
                 {% else %}
                     {{ recipe.source }}
                 {% endif %}
+                </p>
             </div>
             <div id="categories">
                 {% if recipe.categories %}
-                    <h3>Categories:</h3>
+                    <p><h3 style="display: inline">Categories:</h3>
                     {% for category in recipe.categories.all %}
                         <a href="{% url 'RecipeBook:category_detail' category.slug %}">{{ category }} </a>
                     {% endfor %}
+                    </p>
                 {% endif %}
             </div>
         {% endif %}
