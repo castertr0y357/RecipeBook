@@ -4,6 +4,7 @@ from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
 from django import db
 from .models import Category, Recipe
 from .forms import SearchForm, RecipeForm
+from .formatting import format_time
 from urllib.parse import urlencode
 
 
@@ -154,7 +155,9 @@ class CategoryDetailView(BaseDetailView):
         category = self.object
         category.recipes = Recipe.objects.filter(categories=category)
         for recipe in category.recipes:
-            recipe.total_time = recipe.prep_time + recipe.cook_time
+            recipe.total_time = format_time(recipe.prep_time + recipe.cook_time)
+            if "http" in recipe.source:
+                recipe.link = recipe.source
 
         context['category'] = category
         return context
@@ -181,6 +184,8 @@ class RecipeDetailView(BaseDetailView):
         recipe = self.get_object()
         recipe.ingredients = recipe.ingredients_list.split('\n')
         recipe.directions = recipe.directions.split('\n')
+        recipe.prep_time = format_time(recipe.prep_time)
+        recipe.cook_time = format_time(recipe.cook_time)
 
         if "http" in str(recipe.source):
             recipe.link = recipe.source
