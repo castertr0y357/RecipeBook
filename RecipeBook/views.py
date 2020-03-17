@@ -1,7 +1,10 @@
 from django.views.generic import ListView, DetailView, FormView
 from django.core.exceptions import ValidationError
 from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
+from django.db.models import Count, Sum, IntegerField
 from django import db
+from django.core.serializers import serialize
+from django.http import JsonResponse
 from .models import Category, Recipe
 from .forms import SearchForm, RecipeForm
 from .formatting import format_time
@@ -13,8 +16,7 @@ class BaseListView(ListView):
     search = SearchForm
 
     def get_context_data(self, *args, **kwargs):
-        context = super(BaseListView, self).get_context_data()
-        context['form'] = self.search
+        context = {'form': self.search}
         return context
 
     @staticmethod
@@ -35,8 +37,7 @@ class BaseDetailView(DetailView):
     search = SearchForm
 
     def get_context_data(self, **kwargs):
-        context = super(BaseDetailView, self).get_context_data()
-        context['form'] = self.search
+        context = {'form': self.search}
         return context
 
     @staticmethod
@@ -141,6 +142,37 @@ class CategoryListView(BaseListView):
         context['categories'] = categories
         return context
 
+    def get(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            sorting_method = self.request.GET.get('sorting_method')
+            ascending = self.request.GET.get('ascending')
+            data = []
+            if ascending == "true":
+                if sorting_method == "recipe_count":
+                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by('recipe_count')
+                else:
+                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by(sorting_method)
+            elif ascending != "true":
+                if sorting_method == "recipe_count":
+                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by('recipe_count')\
+                        .reverse()
+                else:
+                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by(sorting_method)\
+                        .reverse()
+            else:
+                query = None
+                data = serialize('json', None)
+
+            if query is not None:
+                for obj in query:
+                    url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
+                    json_data = {"name": url_link, "recipe_count": obj.recipe_count}
+                    data.append(json_data)
+
+            return JsonResponse(data=data, safe=False)
+        else:
+            return render(self.request, self.template_name, context=self.get_context_data())
+
 
 class CategoryDetailView(BaseDetailView):
     model = Category
@@ -152,7 +184,7 @@ class CategoryDetailView(BaseDetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(CategoryDetailView, self).get_context_data()
-        category = self.object
+        category = self.get_object()
         category.recipes = Recipe.objects.filter(categories=category)
         for recipe in category.recipes:
             recipe.total_time = format_time(recipe.prep_time + recipe.cook_time)
@@ -161,6 +193,43 @@ class CategoryDetailView(BaseDetailView):
 
         context['category'] = category
         return context
+
+    def get(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            sorting_method = self.request.GET.get('sorting_method')
+            ascending = self.request.GET.get('ascending')
+            data = []
+            if ascending == "true":
+                if sorting_method == "source":
+                    query = None
+                elif sorting_method == "total_time":
+                    query = Recipe.objects.filter(categories=self.get_object())\
+                        .annotate(total_time=Sum(field='prep_time*cook_time', output_field=IntegerField))\
+                        .order_by('total_time')
+                else:
+                    query = Recipe.objects.filter().annotate(total_time=Sum(field='prep_time+cook_time',
+                                                                            output_field=IntegerField))\
+                        .order_by(sorting_method)
+            elif ascending != "true":
+                if sorting_method == "recipe_count":
+                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by('recipe_count')\
+                        .reverse()
+                else:
+                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by(sorting_method)\
+                        .reverse()
+            else:
+                query = None
+                data = serialize('json', None)
+
+            if query is not None:
+                for obj in query:
+                    url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
+                    json_data = {"name": url_link, "recipe_count": obj.recipe_count}
+                    data.append(json_data)
+
+            return JsonResponse(data=data, safe=False)
+        else:
+            return render(self.request, self.template_name, context=self.get_context_data())
 
 
 # ------------------------------------- Recipe views -------------------------------------------------------------------

@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class Category(models.Model):
@@ -8,6 +9,9 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('RecipeBook:category_detail', args=[str(self.slug)])
 
 
 class Recipe(models.Model):
@@ -24,3 +28,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('RecipeBook:view_recipe', args=[str(self.slug)])
