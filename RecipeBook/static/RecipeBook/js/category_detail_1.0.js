@@ -39,8 +39,7 @@ function replaceTableContents(table, data) {
                 .text(element.servings))
             .append($('<td>')
                 .text(element.time))
-            .append($('<td>')
-                .text(element.source))
+            .append('<td>' + element.source + '</td>')
         );
     });
 }
