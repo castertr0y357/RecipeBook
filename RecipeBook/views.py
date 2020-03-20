@@ -115,7 +115,7 @@ class SearchView(BaseListView):
     def get_context_data(self, *args, **kwargs):
         context = super(SearchView, self).get_context_data()
         name = self.request.GET.get('name')
-        recipes = Recipe.objects.filter(name__icontains=name).order_by('name')
+        recipes = Recipe.objects.filter(name__icontains=name)
         for recipe in recipes:
             recipe.total_time = recipe.cook_time + recipe.prep_time
             if "http" in recipe.source:
