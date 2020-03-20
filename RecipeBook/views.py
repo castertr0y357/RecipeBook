@@ -118,6 +118,8 @@ class SearchView(BaseListView):
         recipes = Recipe.objects.filter(name__icontains=name).order_by('name')
         for recipe in recipes:
             recipe.total_time = recipe.cook_time + recipe.prep_time
+            if "http" in recipe.source:
+                recipe.link = recipe.source
         form = self.search
 
         context['name'] = name
