@@ -1,10 +1,12 @@
 # django imports
 from django import forms
+from django.contrib.auth.forms import AuthenticationForm
 from .models import Recipe
 
 
 class SearchForm(forms.Form):
-    search_name = forms.CharField(widget=forms.TextInput(attrs={'size': 60}),
+    search_name = forms.CharField(widget=forms.TextInput(attrs={'size': 30, 'autofocus': True,
+                                                                'placeholder': 'Ex: Chicken or Chick'}),
                                   label='Search by name ',
                                   required=True,
                                   initial='',

@@ -1,3 +1,4 @@
+# Django imports
 from django.views.generic import ListView, DetailView, FormView
 from django.core.exceptions import ValidationError
 from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
@@ -5,6 +6,10 @@ from django.db.models import Count, F
 from django import db
 from django.core.serializers import serialize
 from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.forms import AuthenticationForm
+
+# Local imports
 from .models import Category, Recipe
 from .forms import SearchForm, RecipeForm
 from .formatting import format_time
@@ -86,11 +91,13 @@ class BaseFormView(FormView):
 
 
 # ------------------------------------- Main and Search Views ----------------------------------------------------------
-class MainView(BaseListView):
+class MainView(LoginRequiredMixin, BaseListView):
     model = Category
     template_name = 'RecipeBook/main_page.html'
     context_object_name = 'categories'
     queryset = None
+
+    login_url = '/accounts/login/'
 
     def get_context_data(self, *args, **kwargs):
         context = super(MainView, self).get_context_data()

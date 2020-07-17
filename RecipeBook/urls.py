@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path, include
+from django.contrib.auth import views as auth_views
 from . import views
 
 app_name = 'RecipeBook'
@@ -28,4 +29,7 @@ urlpatterns = [
     path('meal_planner/', views.MealPlannerView.as_view(), name='meal_planner'),
     # ex: /search_results/
     path('search_results', views.SearchView.as_view(), name='search_results'),
+    # --------------------------------Authentication---------------------------------------------
+    # ex: /login/
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
