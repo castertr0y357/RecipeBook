@@ -12,6 +12,19 @@ $(document).ready(function(){
             dataType: 'json',
             success: function (data) {
                 replaceTableContents(tableID, data);
+                $('#'+tableID).find('thead').each(function () {
+                    console.log($(this));
+                    $(this).find('tr').each(function () {
+                        $(this).find('th').each(function () {
+                            if($(this).is(th_id)) {
+                                //Leave element unaffected
+                            } else {
+                                $(this).attr("data-asc", "true");
+                                $(this).find('span').text('');
+                            }
+                        });
+                    });
+                });
                 if(asc === "true"){
                     $(th_id).attr("data-asc", "false");
                     $(th_id).find('span').text('/\\');
