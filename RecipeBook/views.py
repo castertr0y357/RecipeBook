@@ -91,7 +91,7 @@ class BaseFormView(FormView):
 
 
 # ------------------------------------- Main and Search Views ----------------------------------------------------------
-class MainView(LoginRequiredMixin, BaseListView):
+class MainView(BaseListView):
     model = Category
     template_name = 'RecipeBook/main_page.html'
     context_object_name = 'categories'
