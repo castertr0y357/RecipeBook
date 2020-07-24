@@ -1,0 +1,24 @@
+.login{
+
+}
+
+.login table{
+    text-align: left;
+    table-layout: auto;
+    margin-left: auto;
+    margin-right: auto;
+    vertical-align: middle;
+    vert-align: middle;
+}
+
+.login td{
+    padding: 5px;
+}
+
+.login h2{
+    text-align: center;
+}
+
+.login div{
+    align-self: center;
+}

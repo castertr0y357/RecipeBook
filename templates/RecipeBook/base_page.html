@@ -33,11 +33,22 @@
                 <li><a href="{% url 'RecipeBook:add_recipe' %}">Add Recipe</a></li>
                 <li><a href="{% url 'RecipeBook:shopping_list' %}">Shopping List</a></li>
                 <li style="float: right">
-                    <form action="" method="post" name="search" title="Search">
-                        {% csrf_token %}
-                        {{ form }}
-                        <input type="submit" value="search">
-                    </form>
+                    <ul style="display: inline">
+                        <li>
+                            {% if user.is_authenticated %}
+                                Welcome {{ user }}   <a href="{% url 'RecipeBook:logout' %}">Logout</a>
+                            {% else %}
+                                <a href="{% url 'RecipeBook:login' %}">Login</a>/<a href="{% url 'RecipeBook:create_user' %}">Create Account</a>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <form action="" method="post" name="search" title="Search">
+                                {% csrf_token %}
+                                {{ search_form }}
+                                <input type="submit" value="search">
+                            </form>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>

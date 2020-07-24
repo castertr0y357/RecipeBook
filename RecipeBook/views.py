@@ -6,8 +6,9 @@ from django.db.models import Count, F
 from django import db
 from django.core.serializers import serialize
 from django.http import JsonResponse
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 # Local imports
 from .models import Category, Recipe
@@ -21,7 +22,7 @@ class BaseListView(ListView):
     search = SearchForm
 
     def get_context_data(self, *args, **kwargs):
-        context = {'form': self.search}
+        context = {'search_form': self.search}
         return context
 
     @staticmethod
@@ -42,7 +43,7 @@ class BaseDetailView(DetailView):
     search = SearchForm
 
     def get_context_data(self, **kwargs):
-        context = {'form': self.search}
+        context = {'search_form': self.search}
         return context
 
     @staticmethod
@@ -64,7 +65,7 @@ class BaseUpdateView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(BaseUpdateView, self).get_context_data()
-        context['form'] = self.search
+        context['search_form'] = self.search
         return context
 
     @staticmethod
@@ -86,7 +87,7 @@ class BaseFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(BaseFormView, self).get_context_data()
-        context['form'] = self.search
+        context['search_form'] = self.search
         return context
 
 
@@ -433,7 +434,7 @@ class RecipeEditView(BaseDetailView):
         return db_category
 
 
-class RecipeAddView(BaseFormView):
+class RecipeAddView(LoginRequiredMixin, BaseFormView):
     model = Recipe
     template_name = 'RecipeBook/add_recipe.html'
     context_object_name = 'recipe_add'
@@ -562,3 +563,20 @@ class MealPlannerView(BaseDetailView):
         context = super(MealPlannerView, self).get_context_data()
 
         return context
+
+
+# --------------------------------------------- Authentication views ---------------------------------------------------
+class CreateUserView(BaseFormView):
+    create_account = UserCreationForm
+    search = SearchForm
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(CreateUserView, self).get_context_data()
+
+        context['account_form'] = self.create_account
+
+        return context
+
+
+class LoginView(auth_views.LoginView, BaseFormView):
+    search = SearchForm

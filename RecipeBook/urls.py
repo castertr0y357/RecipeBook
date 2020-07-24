@@ -1,5 +1,4 @@
 from django.urls import path, include
-from django.contrib.auth import views as auth_views
 from . import views
 
 app_name = 'RecipeBook'
@@ -32,4 +31,5 @@ urlpatterns = [
     # --------------------------------Authentication---------------------------------------------
     # ex: /login/
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/create_account', views.CreateUserView.as_view(), name='create_user'),
 ]
