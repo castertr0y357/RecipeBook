@@ -36,13 +36,13 @@
                     <ul style="display: inline">
                         <li>
                             {% if user.is_authenticated %}
-                                Welcome {{ user }}   <a href="{% url 'RecipeBook:logout' %}">Logout</a>
+                                Welcome {{ user }} | <a href="{% url 'RecipeBook:logout' %}">Logout</a>
                             {% else %}
                                 <a href="{% url 'RecipeBook:login' %}">Login</a>/<a href="{% url 'RecipeBook:create_user' %}">Create Account</a>
                             {% endif %}
                         </li>
                         <li>
-                            <form action="" method="post" name="search" title="Search">
+                            <form action="{% url 'RecipeBook:search_results' %}" method="post" name="search" title="Search">
                                 {% csrf_token %}
                                 {{ search_form }}
                                 <input type="submit" value="search">

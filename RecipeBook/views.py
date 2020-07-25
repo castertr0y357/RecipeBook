@@ -1,5 +1,5 @@
 # Django imports
-from django.views.generic import ListView, DetailView, FormView
+from django.views.generic import ListView, DetailView, FormView, View
 from django.core.exceptions import ValidationError
 from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
 from django.db.models import Count, F
@@ -18,81 +18,22 @@ from urllib.parse import urlencode
 
 
 # ------------------------------------- Base Views ---------------------------------------------------------------------
-class BaseListView(ListView):
-    search = SearchForm
-
-    def get_context_data(self, *args, **kwargs):
-        context = {'search_form': self.search}
-        return context
-
-    @staticmethod
-    def post(request, *slug):
-        if request.method == 'POST':
-            form = SearchForm(request.POST)
-            if form.is_valid():
-                name = form.cleaned_data['search_name']
-                base_url = reverse('RecipeBook:search_results')
-                query_string = urlencode({'name': name})
-                url = '{}?{}'.format(base_url, query_string)
-                return HttpResponseRedirect(url)
-            else:
-                raise ValidationError
-
-
-class BaseDetailView(DetailView):
+class SearchMixin(View):
     search = SearchForm
 
     def get_context_data(self, **kwargs):
         context = {'search_form': self.search}
         return context
 
-    @staticmethod
-    def post(request, **slug):
-        if request.method == 'POST':
-            form = SearchForm(request.POST)
-            if form.is_valid():
-                name = form.cleaned_data['search_name']
-                base_url = reverse('RecipeBook:search_results')
-                query_string = urlencode({'name': name})
-                url = '{}?{}'.format(base_url, query_string)
-                return HttpResponseRedirect(url)
-            else:
-                raise ValidationError
 
-
-class BaseUpdateView(FormView):
-    search = SearchForm
-
+class BaseUpdateView(SearchMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super(BaseUpdateView, self).get_context_data()
-        context['search_form'] = self.search
-        return context
-
-    @staticmethod
-    def post(request, *slug):
-        if request.method == 'POST':
-            form = SearchForm(request.POST)
-            if form.is_valid():
-                name = form.cleaned_data['search_name']
-                base_url = reverse('RecipeBook:search_results')
-                query_string = urlencode({'name': name})
-                url = '{}?{}'.format(base_url, query_string)
-                return HttpResponseRedirect(url)
-            else:
-                raise ValidationError
-
-
-class BaseFormView(FormView):
-    search = SearchForm
-
-    def get_context_data(self, **kwargs):
-        context = super(BaseFormView, self).get_context_data()
-        context['search_form'] = self.search
         return context
 
 
 # ------------------------------------- Main and Search Views ----------------------------------------------------------
-class MainView(BaseListView):
+class MainView(SearchMixin, ListView):
     model = Category
     template_name = 'RecipeBook/main_page.html'
     context_object_name = 'categories'
@@ -112,7 +53,7 @@ class MainView(BaseListView):
         return context
 
 
-class SearchView(BaseListView):
+class SearchView(SearchMixin, ListView):
     model = Recipe
     template_name = 'RecipeBook/search_results.html'
     context_object_name = 'search_results'
@@ -179,9 +120,22 @@ class SearchView(BaseListView):
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
 
+    @staticmethod
+    def post(request):
+        if request.method == 'POST':
+            form = SearchForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['search_name']
+                base_url = reverse('RecipeBook:search_results')
+                query_string = urlencode({'name': name})
+                url = '{}?{}'.format(base_url, query_string)
+                return HttpResponseRedirect(url)
+            else:
+                raise ValidationError
+
 
 # ------------------------------------- Category views -----------------------------------------------------------------
-class CategoryListView(BaseListView):
+class CategoryListView(SearchMixin, ListView):
     model = Category
     template_name = 'RecipeBook/category_list.html'
     context_object_name = 'category_list'
@@ -192,7 +146,7 @@ class CategoryListView(BaseListView):
         categories = Category.objects.all()
         for category in categories:
             category.recipes = Recipe.objects.filter(categories=category)
-
+        # context = {'categories': categories}
         context['categories'] = categories
         return context
 
@@ -228,7 +182,7 @@ class CategoryListView(BaseListView):
             return render(self.request, self.template_name, context=self.get_context_data())
 
 
-class CategoryDetailView(BaseDetailView):
+class CategoryDetailView(SearchMixin, DetailView):
     model = Category
     template_name = 'RecipeBook/category_detail.html'
     context_object_name = 'category_recipe_list'
@@ -292,14 +246,14 @@ class CategoryDetailView(BaseDetailView):
 
 
 # ------------------------------------- Recipe views -------------------------------------------------------------------
-class RecipeListView(BaseListView):
+class RecipeListView(SearchMixin, ListView):
     model = Recipe
     template_name = 'RecipeBook/recipe_list.html'
     queryset = None
     # only here to provide path for Recipes, no actual view is needed
 
 
-class RecipeDetailView(BaseDetailView):
+class RecipeDetailView(SearchMixin, DetailView):
     model = Recipe
     template_name = 'RecipeBook/recipe_detail.html'
     context_object_name = 'recipe_view'
@@ -326,9 +280,11 @@ class RecipeDetailView(BaseDetailView):
             resize_value = self.request.GET.get('resize_value')
             recipe = Recipe.objects.get(id=self.get_object())
 
+        else:
+            return render(self.request, self.template_name, context=self.get_context_data())
 
 
-class RecipeEditView(BaseDetailView):
+class RecipeEditView(SearchMixin, DetailView):
     model = Recipe
     template_name = 'RecipeBook/edit_recipe.html'
     queryset = None
@@ -441,7 +397,7 @@ class RecipeEditView(BaseDetailView):
         return db_category
 
 
-class RecipeAddView(LoginRequiredMixin, BaseFormView):
+class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
     model = Recipe
     template_name = 'RecipeBook/add_recipe.html'
     context_object_name = 'recipe_add'
@@ -450,9 +406,8 @@ class RecipeAddView(LoginRequiredMixin, BaseFormView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeAddView, self).get_context_data()
-
-        context['recipe_add_form'] = RecipeForm(initial={'prep_time': '', 'cook_time': '', 'servings': ''})
-
+        # context['recipe_add_form'] = RecipeForm(initial={'prep_time': '', 'cook_time': '', 'servings': ''})
+        context['recipe_add_form'] = RecipeForm()
         return context
 
     def post(self, request):
@@ -550,41 +505,35 @@ class RecipeAddView(LoginRequiredMixin, BaseFormView):
 
 
 # ------------------------------------- Shopping list and Meal planner views -------------------------------------------
-class ShoppingListView(BaseListView):
+class ShoppingListView(SearchMixin, ListView):
     model = Recipe
     context_object_name = 'shopping_list'
     queryset = None
 
     def get_context_data(self, *args, **kwargs):
         context = super(ShoppingListView, self).get_context_data()
-
         return context
 
 
-class MealPlannerView(BaseDetailView):
+class MealPlannerView(SearchMixin, DetailView):
     model = Recipe
     context_object_name = 'meal_planner'
     queryset = None
 
     def get_context_data(self, *args, **kwargs):
         context = super(MealPlannerView, self).get_context_data()
-
         return context
 
 
 # --------------------------------------------- Authentication views ---------------------------------------------------
-class CreateUserView(BaseFormView):
+class CreateUserView(SearchMixin, FormView):
     create_account = UserCreationForm
-    search = SearchForm
 
     def get_context_data(self, *args, **kwargs):
         context = super(CreateUserView, self).get_context_data()
-
         context['account_form'] = self.create_account
-
         return context
 
 
-class LoginView(auth_views.LoginView, BaseFormView):
-    search = SearchForm
-
+class LoginView(SearchMixin, auth_views.LoginView, FormView):
+    pass
