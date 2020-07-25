@@ -98,8 +98,6 @@ class MainView(BaseListView):
     context_object_name = 'categories'
     queryset = None
 
-    login_url = '/accounts/login/'
-
     def get_context_data(self, *args, **kwargs):
         context = super(MainView, self).get_context_data()
         categories = Category.objects.all()
@@ -122,7 +120,10 @@ class SearchView(BaseListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(SearchView, self).get_context_data()
-        name = self.request.GET.get('name')
+        name = ""
+        if self.request.method == 'POST':
+            form = SearchForm(self.request.POST)
+            name = form.clean_name()
         recipes = Recipe.objects.filter(name__icontains=name)
         for recipe in recipes:
             recipe.total_time = recipe.cook_time + recipe.prep_time
@@ -319,6 +320,12 @@ class RecipeDetailView(BaseDetailView):
 
         context['recipe'] = recipe
         return context
+
+    def get(self, request, *args, **kwargs):
+        if self.request.is_ajax():
+            resize_value = self.request.GET.get('resize_value')
+            recipe = Recipe.objects.get(id=self.get_object())
+
 
 
 class RecipeEditView(BaseDetailView):
@@ -580,3 +587,4 @@ class CreateUserView(BaseFormView):
 
 class LoginView(auth_views.LoginView, BaseFormView):
     search = SearchForm
+

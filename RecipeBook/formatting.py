@@ -1,4 +1,5 @@
 from math import floor
+from fractions import Fraction
 
 
 def format_time(time_minutes):
@@ -16,3 +17,12 @@ def format_time(time_minutes):
         time += str(minutes) + " minute"
 
     return time
+
+
+def format_volume(volume, units, multiplier):
+    unit_list = ["cups", "cup", "tablespoons", "tbsp", "tablespoon", "teaspoons", "tsp", "teaspoon", "pounds", "lbs",
+                 "pound", "lb"]
+    new_volume = ""
+    if units == "cups" or "cup":
+        cups = volume
+    return new_volume

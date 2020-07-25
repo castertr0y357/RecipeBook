@@ -4,13 +4,20 @@
         <title>{{ recipe }}</title>
     {% endblock title %}
 
+    {% block scripts %}
+        <script type="text/javascript">let url = "{{ recipe.get_absolute_url }}";</script>
+        {% load static %}
+        <script src="{% static 'RecipeBook/js/recipe_detail_1.0.js' %}"></script>
+
+    {% endblock scripts %}
+
     {% block body %}
         {% if recipe %}
             <a href="{% url 'RecipeBook:edit_recipe' recipe.slug %}" style="float: right">Edit Recipe</a>
             <h1>{{ recipe }}</h1>
             <div id="ingredients_list">
                 <h3>Ingredients:</h3>
-                <ul>
+                <ul id="ingredients_ul">
                     {% for ingredient in recipe.ingredients %}
                         <li>{{ ingredient }}</li>
                     {% endfor %}
