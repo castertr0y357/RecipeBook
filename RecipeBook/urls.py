@@ -30,6 +30,9 @@ urlpatterns = [
     path('search_results', views.SearchView.as_view(), name='search_results'),
     # --------------------------------Authentication---------------------------------------------
     # ex: /login/
-    path('accounts/', include('django.contrib.auth.urls')),
+    # path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/create_account', views.CreateUserView.as_view(), name='create_user'),
+    path('accounts/login', views.LoginView.as_view(), name='login'),
+    path('accounts/logout', views.LogoutView.as_view(), name='logout'),
+    path('accounts/password_reset', views.PasswordResetView.as_view(), name='password_reset'),
 ]

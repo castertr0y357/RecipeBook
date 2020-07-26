@@ -507,6 +507,7 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
 # ------------------------------------- Shopping list and Meal planner views -------------------------------------------
 class ShoppingListView(SearchMixin, ListView):
     model = Recipe
+    template_name = 'RecipeBook/shopping_list.html'
     context_object_name = 'shopping_list'
     queryset = None
 
@@ -515,8 +516,9 @@ class ShoppingListView(SearchMixin, ListView):
         return context
 
 
-class MealPlannerView(SearchMixin, DetailView):
+class MealPlannerView(SearchMixin, ListView):
     model = Recipe
+    template_name = 'RecipeBook/meal_planner.html'
     context_object_name = 'meal_planner'
     queryset = None
 
@@ -535,5 +537,19 @@ class CreateUserView(SearchMixin, FormView):
         return context
 
 
-class LoginView(SearchMixin, auth_views.LoginView, FormView):
+class LoginView(SearchMixin, auth_views.LoginView):
+    template_name = 'registration/login.html'
+    form = AuthenticationForm
+
+    def get_context_data(self, **kwargs):
+        context = super(LoginView, self).get_context_data()
+        context['login_form'] = self.form
+        return context
+
+
+class LogoutView(SearchMixin, auth_views.LogoutView):
+    pass
+
+
+class PasswordResetView(SearchMixin, auth_views.PasswordResetView):
     pass
