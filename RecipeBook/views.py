@@ -6,9 +6,11 @@ from django.db.models import Count, F
 from django import db
 from django.core.serializers import serialize
 from django.http import JsonResponse
+from django.contrib.auth import login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
 
 # Local imports
 from .models import Category, Recipe
@@ -132,6 +134,67 @@ class SearchView(SearchMixin, ListView):
                 return HttpResponseRedirect(url)
             else:
                 raise ValidationError
+
+
+# --------------------------------------------- Authentication views ---------------------------------------------------
+class CreateUserView(SearchMixin, FormView):
+    template_name = 'registration/account_creation.html'
+    account_form = AccountCreationForm
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(CreateUserView, self).get_context_data()
+        context['account_form'] = self.account_form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            form = AccountCreationForm(request.POST)
+            if form.is_valid():
+                if form.check_username():
+                    username = form.clean_username()
+                    password = form.clean_password2()
+                    email = form.clean_email()
+                    first_name = form.clean_first_name()
+                    last_name = form.clean_last_name()
+                    user = User.objects.create_user(username=username,
+                                                    password=password,
+                                                    email=email)
+                    user.first_name = first_name
+                    user.last_name = last_name
+
+                    while True:
+                        try:
+                            user.save()
+                            break
+                        except db.utils.OperationalError:
+                            print("DB is locked")
+
+                    login(request, user)
+
+                    return redirect('RecipeBook:main')
+            else:
+                return render(self.request, template_name=self.template_name, context=self.get_context_data())
+
+        else:
+            return render(self.request, self.template_name, self.get_context_data())
+
+
+class LoginView(SearchMixin, auth_views.LoginView):
+    template_name = 'registration/login.html'
+    form = AuthenticationForm
+
+    def get_context_data(self, **kwargs):
+        context = super(LoginView, self).get_context_data()
+        context['login_form'] = self.form
+        return context
+
+
+class LogoutView(SearchMixin, auth_views.LogoutView):
+    pass
+
+
+class PasswordResetView(SearchMixin, auth_views.PasswordResetView):
+    pass
 
 
 # ------------------------------------- Category views -----------------------------------------------------------------
@@ -520,35 +583,3 @@ class MealPlannerView(SearchMixin, ListView):
         context = super(MealPlannerView, self).get_context_data()
         return context
 
-
-# --------------------------------------------- Authentication views ---------------------------------------------------
-class CreateUserView(SearchMixin, FormView):
-    template_name = 'registration/account_creation.html'
-    account_form = AccountCreationForm
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(CreateUserView, self).get_context_data()
-        context['account_form'] = self.account_form
-        return context
-
-    def post(self, request, *args, **kwargs):
-        if request.method == 'POST':
-            form = AccountCreationForm(request.POST)
-
-
-class LoginView(SearchMixin, auth_views.LoginView):
-    template_name = 'registration/login.html'
-    form = AuthenticationForm
-
-    def get_context_data(self, **kwargs):
-        context = super(LoginView, self).get_context_data()
-        context['login_form'] = self.form
-        return context
-
-
-class LogoutView(SearchMixin, auth_views.LogoutView):
-    pass
-
-
-class PasswordResetView(SearchMixin, auth_views.PasswordResetView):
-    pass
