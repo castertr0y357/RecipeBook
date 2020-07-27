@@ -1,7 +1,7 @@
 # django imports
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
-from .models import Recipe
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 
 class SearchForm(forms.Form):
@@ -56,3 +56,21 @@ class RecipeForm(forms.Form):
                                      label='Categories',
                                      required=True,
                                      initial='')
+
+
+class AccountCreationForm(UserCreationForm, forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        'size': '50', 'placeholder': 'Ex: someone@domain.com'}),
+        label='E-mail Address',
+        required=True,
+        initial='')
+    first_name = forms.CharField(widget=forms.TextInput(attrs={
+        'size': '20', 'placeholder': 'First Name'}),
+        label='First Name',
+        required=True,
+        initial='')
+    last_name = forms.CharField(widget=forms.TextInput(attrs={
+        'size': '40', 'placeholder': 'Last Name'}),
+        label='Last Name',
+        required=True,
+        initial='')

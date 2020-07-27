@@ -1,0 +1,44 @@
+{% extends 'RecipeBook/base_page.html' %}
+
+{% block title %}
+    <title>Create Account</title>
+{% endblock %}
+
+{% block body %}
+    <div class="login" style="vertical-align: middle; height: 100%; margin-top: 13%">
+        <table class="login" style="border: none; margin-top: auto; margin-bottom: auto">
+            <tr>
+                <td>
+                    {% if form.errors %}
+                        <p>Your username and password didn't match.  Please try again</p>
+                    {% endif %}
+
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <table>
+                                <tr>
+                                    <td>{{ login_form.username.label_tag }}</td>
+                                    <td>{{ login_form.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ login_form.password.label_tag }}</td>
+                                    <td>{{ login_form.password }}</td>
+                                </tr>
+                            </td>
+                        </table>
+                        <div style="padding-top: 5px">
+                            <input type="submit" value="login"/>
+                            <input type="hidden" name="next" value="{{ next }}"/>
+                        </div>
+                    </form>
+
+                    <p>
+                        <div><a href="{% url 'RecipeBook:password_reset' %}">Forgot Password</a></div>
+                        <div>Not yet registered? <a href="{% url 'RecipeBook:create_user' %}">Create Account</a></div>
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+    {{ account_form.as_table }}
+{% endblock %}

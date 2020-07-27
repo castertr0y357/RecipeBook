@@ -39,7 +39,7 @@
                             {% if user.is_authenticated %}
                                 Welcome {{ user }} | <a href="{% url 'RecipeBook:logout' %}">Logout</a>
                             {% else %}
-                                <a href="{% url 'RecipeBook:login' %}">Login</a>/<a href="{% url 'RecipeBook:create_user' %}">Create Account</a>
+                                <a href="{% url 'RecipeBook:login' %}">Login</a> | <a href="{% url 'RecipeBook:create_user' %}">Create Account</a>
                             {% endif %}
                         </li>
                         <li>

@@ -12,7 +12,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 # Local imports
 from .models import Category, Recipe
-from .forms import SearchForm, RecipeForm
+from .forms import SearchForm, RecipeForm, AccountCreationForm
 from .formatting import format_time
 from urllib.parse import urlencode
 
@@ -529,11 +529,12 @@ class MealPlannerView(SearchMixin, ListView):
 
 # --------------------------------------------- Authentication views ---------------------------------------------------
 class CreateUserView(SearchMixin, FormView):
-    create_account = UserCreationForm
+    template_name = 'registration/account_creation.html'
+    account_form = AccountCreationForm
 
     def get_context_data(self, *args, **kwargs):
         context = super(CreateUserView, self).get_context_data()
-        context['account_form'] = self.create_account
+        context['account_form'] = self.account_form
         return context
 
 
