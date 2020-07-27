@@ -313,7 +313,7 @@ class RecipeEditView(SearchMixin, DetailView):
 
     def post(self, request, **slug):
         if request.method == 'POST':
-            search_form = SearchForm(request.POST)
+            # search_form = SearchForm(request.POST)
             edit_form = RecipeForm(request.POST)
             if edit_form.is_valid():
                 name = edit_form.cleaned_data['recipe_name']
@@ -336,12 +336,6 @@ class RecipeEditView(SearchMixin, DetailView):
                 recipe = self.update_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
                                             categories_list)
                 return redirect('RecipeBook:view_recipe', slug=recipe.slug)
-            elif search_form.is_valid():
-                name = search_form.cleaned_data['search_name']
-                base_url = reverse('RecipeBook:search_results')
-                query_string = urlencode({'name': name})
-                url = '{}?{}'.format(base_url, query_string)
-                return HttpResponseRedirect(url)
             else:
                 return render('RecipeBook:edit_recipe', {'form': edit_form})
 
@@ -536,6 +530,10 @@ class CreateUserView(SearchMixin, FormView):
         context = super(CreateUserView, self).get_context_data()
         context['account_form'] = self.account_form
         return context
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            form = AccountCreationForm(request.POST)
 
 
 class LoginView(SearchMixin, auth_views.LoginView):

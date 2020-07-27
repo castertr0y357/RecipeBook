@@ -14,7 +14,6 @@ class SearchForm(forms.Form):
 
     def clean_name(self):
         name = self.cleaned_name['search_name']
-
         return name
 
 
@@ -65,12 +64,14 @@ class AccountCreationForm(UserCreationForm, forms.Form):
         required=True,
         initial='')
     first_name = forms.CharField(widget=forms.TextInput(attrs={
-        'size': '20', 'placeholder': 'First Name'}),
+        'size': '20'}),
         label='First Name',
         required=True,
         initial='')
     last_name = forms.CharField(widget=forms.TextInput(attrs={
-        'size': '40', 'placeholder': 'Last Name'}),
+        'size': '40'}),
         label='Last Name',
         required=True,
         initial='')
+
+
