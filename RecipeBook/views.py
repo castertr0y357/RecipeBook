@@ -10,7 +10,7 @@ from django.contrib.auth import login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model as users
 
 # Local imports
 from .models import Category, Recipe
@@ -150,30 +150,37 @@ class CreateUserView(SearchMixin, FormView):
         if request.method == 'POST':
             form = AccountCreationForm(request.POST)
             if form.is_valid():
-                if form.check_username():
-                    username = form.clean_username()
-                    password = form.clean_password2()
-                    email = form.clean_email()
-                    first_name = form.clean_first_name()
-                    last_name = form.clean_last_name()
-                    user = User.objects.create_user(username=username,
-                                                    password=password,
-                                                    email=email)
-                    user.first_name = first_name
-                    user.last_name = last_name
+                print(True)
+                username = form.clean_username()
+                password = form.clean_password2()
+                email = form.clean_email()
+                first_name = form.clean_first_name()
+                last_name = form.clean_last_name()
+                user = users().objects.create_user(username=username,
+                                                   password=password,
+                                                   email=email)
+                user.first_name = first_name
+                user.last_name = last_name
 
-                    while True:
-                        try:
-                            user.save()
-                            break
-                        except db.utils.OperationalError:
-                            print("DB is locked")
+                print(user)
 
-                    login(request, user)
+                while True:
+                    try:
+                        user.save()
+                        break
+                    except db.utils.OperationalError:
+                        print("DB is locked")
 
-                    return redirect('RecipeBook:main')
+                print(users().objects.get(username=username))
+
+                login(request, user)
+
+                return redirect('RecipeBook:main')
             else:
-                return render(self.request, template_name=self.template_name, context=self.get_context_data())
+                print("form was not valid")
+                print(form.error_messages)
+                return render('RecipeBook:create_user', template_name='registration/account_creation.html',
+                              context={'account_form': form})
 
         else:
             return render(self.request, self.template_name, self.get_context_data())

@@ -100,9 +100,11 @@ class AccountCreationForm(UserCreationForm, forms.Form):
 
     def check_username(self):
         username = self.clean_username
+        print(username)
         # Check if username already is in the database
         try:
-            User.objects.get(username=username)
+            test_user = User.objects.get(username=username)
+            print(test_user)
             raise forms.ValidationError(
                 self.error_messages['username_exists'],
                 code='username_exists'
