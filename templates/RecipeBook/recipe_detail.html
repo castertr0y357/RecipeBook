@@ -13,7 +13,9 @@
 
     {% block body %}
         {% if recipe %}
-            <a href="{% url 'RecipeBook:edit_recipe' recipe.slug %}" style="float: right">Edit Recipe</a>
+            {% if user == recipe.submitter or user.is_superuser %}
+                <a href="{% url 'RecipeBook:edit_recipe' recipe.slug %}" style="float: right">Edit Recipe</a>
+            {% endif %}
             <h1>{{ recipe }}</h1>
             <div id="ingredients_list">
                 <h3>Ingredients:</h3>
@@ -53,6 +55,14 @@
                         {{ recipe.source }}
                     {% endif %}
                 </p>
+            </div>
+            <div id="submitter">
+                {% if recipe.submitter %}
+                    <p>
+                        <h3 style="display: inline">Submitted by:</h3>
+                        {{ recipe.submitter.username }}
+                    </p>
+                {% endif %}
             </div>
             <div id="categories">
                 {% if recipe.categories %}

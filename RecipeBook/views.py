@@ -354,7 +354,7 @@ class RecipeDetailView(SearchMixin, DetailView):
             return render(self.request, self.template_name, context=self.get_context_data())
 
 
-class RecipeEditView(SearchMixin, DetailView):
+class RecipeEditView(SearchMixin, UserPassesTestMixin, DetailView):
     model = Recipe
     template_name = 'RecipeBook/edit_recipe.html'
     queryset = None
@@ -380,6 +380,10 @@ class RecipeEditView(SearchMixin, DetailView):
         context['recipe'] = recipe
         context['recipe_edit_form'] = recipe_edit_form
         return context
+
+    def test_func(self):
+        recipe = self.get_object()
+        return (self.request.user == recipe.submitter) or self.request.user.is_superuser
 
     def post(self, request, **slug):
         if request.method == 'POST':
@@ -476,7 +480,7 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
 
     def post(self, request):
         if request.method == 'POST':
-            search_form = SearchForm(request.POST)
+            # search_form = SearchForm(request.POST)
             add_form = RecipeForm(request.POST)
             if add_form.is_valid():
                 name = add_form.cleaned_data['recipe_name']
@@ -486,6 +490,7 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
                 prep_time = add_form.cleaned_data['prep_time']
                 cook_time = add_form.cleaned_data['cook_time']
                 source = add_form.cleaned_data['source']
+                submitter = request.user
                 categories = add_form.cleaned_data['category_input']
                 categories_list = []
 
@@ -498,19 +503,14 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
                 print(categories_list)
 
                 recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
-                                            categories_list)
+                                            categories_list, submitter)
 
                 return redirect('RecipeBook:view_recipe', slug=recipe.slug)
-            elif search_form.is_valid():
-                name = search_form.cleaned_data['search_name']
-                base_url = reverse('RecipeBook:search_results')
-                query_string = urlencode({'name': name})
-                url = '{}?{}'.format(base_url, query_string)
-                return HttpResponseRedirect(url)
             else:
                 return render('RecipeBook:add_recipe', {'form': add_form})
 
-    def create_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, categories):
+    def create_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, categories,
+                      submitter):
         while True:
             try:
                 recipe = Recipe.objects.create(name=name,
@@ -519,7 +519,8 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
                                                servings=servings,
                                                prep_time=prep_time,
                                                cook_time=cook_time,
-                                               source=source)
+                                               source=source,
+                                               submitter=submitter)
                 break
             except db.utils.OperationalError:
                 print("DB is locked")
