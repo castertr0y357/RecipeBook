@@ -61,10 +61,7 @@ class SearchView(SearchMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(SearchView, self).get_context_data()
-        name = ""
-        if self.request.method == 'POST':
-            form = SearchForm(self.request.POST)
-            name = form.clean_name()
+        name = self.request.GET.get('name')
         recipes = Recipe.objects.filter(name__icontains=name)
         for recipe in recipes:
             recipe.total_time = recipe.cook_time + recipe.prep_time
