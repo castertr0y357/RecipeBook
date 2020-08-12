@@ -28,6 +28,12 @@ urlpatterns = [
     path('meal_planner/', views.MealPlannerView.as_view(), name='meal_planner'),
     # ex: /search_results/
     path('search_results', views.SearchView.as_view(), name='search_results'),
+    # -----------------------------------Profiles------------------------------------------------
+    # ex: /Profiles/
+    path('Profiles/', views.ProfileListView.as_view(), name='profile_list'),
+    # ex: /Profiles/admin/
+    path('Profiles/<username>', views.ProfileDetailView.as_view(), name='profile_detail'),
+    path('Profiles/<path:username>', views.ProfileDetailView.as_view(), name='profile_detail'),
     # --------------------------------Authentication---------------------------------------------
     # ex: /login/
     # path('accounts/', include('django.contrib.auth.urls')),

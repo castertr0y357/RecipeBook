@@ -60,7 +60,7 @@
                 {% if recipe.submitter %}
                     <p>
                         <h3 style="display: inline">Submitted by:</h3>
-                        {{ recipe.submitter.username }}
+                        <a href="{% url 'RecipeBook:profile_detail' recipe.submitter %}">{{ recipe.submitter.username }}</a>
                     </p>
                 {% endif %}
             </div>

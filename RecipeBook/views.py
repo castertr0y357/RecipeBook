@@ -1,16 +1,14 @@
 # Django imports
-from django.views.generic import ListView, DetailView, FormView, View
+from django.views.generic import ListView, DetailView, FormView, View, TemplateView
 from django.core.exceptions import ValidationError
 from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
 from django.db.models import Count, F
 from django import db
 from django.core.serializers import serialize
 from django.http import JsonResponse
-from django.contrib.auth import login
-from django.contrib.auth import views as auth_views
+from django.contrib.auth import login, views as auth_views, get_user_model as users
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import get_user_model as users
 
 # Local imports
 from .models import Category, Recipe
@@ -202,6 +200,31 @@ class LogoutView(SearchMixin, auth_views.LogoutView):
 
 class PasswordResetView(SearchMixin, auth_views.PasswordResetView):
     pass
+
+
+class ProfileListView(SearchMixin, ListView):
+    model = users()
+    queryset = None
+
+    # Only here to serve as a path for the profiles
+
+
+class ProfileDetailView(SearchMixin, DetailView):
+    model = users()
+    template_name = 'RecipeBook/profile_page.html'
+    queryset = None
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileDetailView, self). get_context_data()
+        user = self.get_object()
+        recipes_submitted = Recipe.objects.filter(submitter=user)
+
+        context['username'] = user
+        context['recipes_submitted'] = recipes_submitted
+
+        return context
 
 
 # ------------------------------------- Category views -----------------------------------------------------------------
