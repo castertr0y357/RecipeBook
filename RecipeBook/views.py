@@ -8,7 +8,7 @@ from django.core.serializers import serialize
 from django.http import JsonResponse
 from django.contrib.auth import login, views as auth_views, get_user_model as users
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 
 # Local imports
 from .models import Category, Recipe
@@ -195,8 +195,18 @@ class LogoutView(SearchMixin, auth_views.LogoutView):
     pass
 
 
-class PasswordResetView(SearchMixin, auth_views.PasswordResetView):
-    pass
+class PasswordChangeView(SearchMixin, auth_views.PasswordChangeView):
+    template_name = 'registration/password_change.html'
+    form = PasswordChangeForm
+
+    def get_context_data(self, **kwargs):
+        context = super(PasswordChangeView, self).get_context_data()
+        context['password_change_form'] = self.form
+        return context
+
+
+class PasswordChangeDoneView(SearchMixin, auth_views.PasswordChangeDoneView):
+    template_name = 'registration/password_change_done.html'
 
 
 class ProfileListView(SearchMixin, ListView):
