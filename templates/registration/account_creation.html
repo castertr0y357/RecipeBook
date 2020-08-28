@@ -27,7 +27,9 @@
                                 </tr>
                                 <tr>
                                     <td>{{ account_form.password1.label_tag }}</td>
-                                    <td>{{ account_form.password1 }}</td>
+                                    <td>{{ account_form.password1 }}
+                                        {{ account_form.password1.help_text }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>{{ account_form.password2.label_tag }}</td>

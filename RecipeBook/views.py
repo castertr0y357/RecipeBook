@@ -201,7 +201,7 @@ class PasswordChangeView(SearchMixin, auth_views.PasswordChangeView):
 
     def get_context_data(self, **kwargs):
         context = super(PasswordChangeView, self).get_context_data()
-        context['password_change_form'] = self.form
+        context['password_change_form'] = self.form(user=self.request.user)
         return context
 
 
