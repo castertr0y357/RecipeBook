@@ -1,5 +1,5 @@
 # Django imports
-from django.views.generic import ListView, DetailView, FormView, View, TemplateView
+from django.views.generic import ListView, DetailView, FormView, View
 from django.core.exceptions import ValidationError
 from django.shortcuts import HttpResponseRedirect, reverse, redirect, render
 from django.db.models import Count, F
@@ -7,7 +7,7 @@ from django import db
 from django.core.serializers import serialize
 from django.http import JsonResponse
 from django.contrib.auth import login, views as auth_views, get_user_model as users
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 
 # Local imports

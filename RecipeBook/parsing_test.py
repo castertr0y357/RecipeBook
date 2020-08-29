@@ -8,6 +8,7 @@ for ingredient in ingredients:
     if "/" in ingredient:
         split_point = ingredient.find("/")
         values = ingredient[0:(split_point + 2)]
+        ingredient_name = ingredient[(split_point + 3):]
         print("values:", values)
         if " " in values:
             whole_number = values.split(" ")[0]
@@ -16,22 +17,24 @@ for ingredient in ingredients:
             manipulated_fraction = Fraction(combined_fraction * 0.5)
             print("whole number:", whole_number)
             print("fraction:", fraction)
-            print("combined fraction", combined_fraction)
-            print("manipulated fraction", manipulated_fraction)
+            print("combined fraction:", combined_fraction)
+            print("manipulated fraction:", manipulated_fraction)
+            print("Resized ingredient:", manipulated_fraction, ingredient_name)
             print()
         else:
             manipulated_fraction = Fraction(values) / 2
             print("manipulated fraction:", manipulated_fraction)
             if manipulated_fraction < Fraction(1/4):
-                tablespoons = manipulated_fraction * 16
-                print("tablespoons:", tablespoons)
+                manipulated_fraction = manipulated_fraction * 16
+                print("tablespoons:", manipulated_fraction)
+                print("Resized ingredient:", manipulated_fraction, ingredient_name)
                 print()
 
     else:
         whole_number = 0
         value = ingredient[0]
         print("value:", value)
-        fraction = Fraction(3)
+        fraction = Fraction(value)
         print("fraction:", fraction)
         manipulated_fraction = fraction / 2
         print("manipulated fraction:", manipulated_fraction)
