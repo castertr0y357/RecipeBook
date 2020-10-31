@@ -111,3 +111,12 @@ class AccountCreationForm(UserCreationForm, forms.Form):
             )
         except User.DoesNotExist:
             return True
+
+
+class RecipeResizingForm(forms.Form):
+    """Form to modify ingredients based on desired recipe servings"""
+    numeric_input = forms.NumberInput()
+    CHOICES = [(2/1, "Double"), (1/2, "1/2"), (1/3, "1/3")]
+    default_recipe_sizes = forms.ChoiceField(choices=CHOICES,
+                                             widget=forms.RadioSelect,
+                                             label="Recipe Sizing")

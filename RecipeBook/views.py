@@ -12,7 +12,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 
 # Local imports
 from .models import Category, Recipe
-from .forms import SearchForm, RecipeForm, AccountCreationForm
+from .forms import SearchForm, RecipeForm, AccountCreationForm, RecipeResizingForm
 from .formatting import format_time
 from urllib.parse import urlencode
 
@@ -254,19 +254,18 @@ class CategoryListView(SearchMixin, ListView):
         if self.request.is_ajax():
             sorting_method = self.request.GET.get('sorting_method')
             ascending = self.request.GET.get('ascending')
+            query_base = Category.objects.all().annotate(recipe_count=Count('recipe'))
             data = []
             if ascending == "true":
                 if sorting_method == "recipe_count":
-                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by('recipe_count')
+                    query = query_base.order_by('recipe_count')
                 else:
-                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by(sorting_method)
+                    query = query_base.order_by(sorting_method)
             elif ascending != "true":
                 if sorting_method == "recipe_count":
-                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by('recipe_count')\
-                        .reverse()
+                    query = query_base.order_by('recipe_count').reverse()
                 else:
-                    query = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by(sorting_method)\
-                        .reverse()
+                    query = query_base.order_by(sorting_method).reverse()
             else:
                 query = None
                 data = serialize('json', None)
@@ -306,25 +305,23 @@ class CategoryDetailView(SearchMixin, DetailView):
         if self.request.is_ajax():
             sorting_method = self.request.GET.get('sorting_method')
             ascending = self.request.GET.get('ascending')
+            query_base = Recipe.objects.filter(categories=self.get_object())\
+                .annotate(total_time=F('prep_time') + F('cook_time'))
             data = []
             if ascending == "true":
                 if sorting_method == "source":
                     query = None
                 elif sorting_method == "total_time":
-                    query = Recipe.objects.filter(categories=self.get_object())\
-                        .annotate(total_time=F('prep_time') + F('cook_time')).order_by('total_time')
+                    query = query_base.order_by('total_time')
                 else:
-                    query = Recipe.objects.filter(categories=self.get_object())\
-                        .annotate(total_time=F('prep_time') + F('cook_time')).order_by(sorting_method)
+                    query = query_base.order_by(sorting_method)
             elif ascending != "true":
                 if sorting_method == "source":
                     query = None
                 elif sorting_method == "total_time":
-                    query = Recipe.objects.filter(categories=self.get_object())\
-                        .annotate(total_time=F('prep_time') + F('cook_time')).order_by('total_time').reverse()
+                    query = query_base.order_by('total_time').reverse()
                 else:
-                    query = Recipe.objects.filter(categories=self.get_object())\
-                        .annotate(total_time=F('prep_time') + F('cook_time')).order_by(sorting_method).reverse()
+                    query = query_base.order_by(sorting_method).reverse()
             else:
                 query = None
                 data = serialize('json', None)
@@ -369,10 +366,13 @@ class RecipeDetailView(SearchMixin, DetailView):
         recipe.prep_time = format_time(recipe.prep_time)
         recipe.cook_time = format_time(recipe.cook_time)
 
+        resize_form = RecipeResizingForm
+
         if "http" in str(recipe.source):
             recipe.link = recipe.source
 
         context['recipe'] = recipe
+        context['resize_form'] = resize_form
         return context
 
     def get(self, request, *args, **kwargs):
