@@ -46,6 +46,11 @@ class RecipeForm(forms.Form):
                                   label='# of Servings',
                                   required=True,
                                   initial='')
+    notes = forms.CharField(widget=forms.Textarea(attrs={
+        'cols': '100', 'rows': '15', 'placeholder': 'Enter any additional notes here'}),
+                            label='Notes',
+                            required=False,
+                            initial='')
     source = forms.CharField(widget=forms.TextInput(attrs={
         'size': '40', 'placeholder': 'Ex: Family recipe book or www.site.com/recipe'}),
                              label='Source',
@@ -115,7 +120,6 @@ class AccountCreationForm(UserCreationForm, forms.Form):
 
 class RecipeResizingForm(forms.Form):
     """Form to modify ingredients based on desired recipe servings"""
-    numeric_input = forms.NumberInput()
     CHOICES = [(2/1, "Double"), (1/2, "1/2"), (1/3, "1/3"), (1/4, "1/4")]
     default_recipe_sizes = forms.ChoiceField(choices=CHOICES,
                                              widget=forms.RadioSelect,

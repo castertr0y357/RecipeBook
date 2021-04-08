@@ -23,10 +23,12 @@
                 </thead>
                 <tbody>
                     {% for category in categories %}
-                        <tr>
-                            <td><a href="{{ category.get_absolute_url }}">{{ category }}</a></td>
-                            <td>{{ category.recipes.count }}</td>
-                        </tr>
+                        {% if category.recipes.count > 0%}
+                            <tr>
+                                <td><a href="{{ category.get_absolute_url }}">{{ category }}</a></td>
+                                <td>{{ category.recipes.count }}</td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
