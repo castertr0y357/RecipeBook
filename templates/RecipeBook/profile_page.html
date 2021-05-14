@@ -23,31 +23,33 @@
 
     {% if recipes_submitted.count > 0 %}
         <h2>Recipes Submitted:</h2>
-        <table id="submitted_list">
-                    <thead>
+        <div class="scrolling">
+            <table id="submitted_list">
+                <thead>
+                    <tr>
+                        <th class="th" id="th_recipe" data-sort="name" data-asc="true">Recipe <span></span></th>
+                        <th class="th" id="th_servings" data-sort="servings" data-asc="true"># of Servings <span></span></th>
+                        <th class="th" id="th_time" data-sort="total_time" data-asc="true">Total time <span></span></th>
+                        <th>Recipe Source <span></span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recipe in recipes_submitted %}
                         <tr>
-                            <th class="th" id="th_recipe" data-sort="name" data-asc="true">Recipe <span></span></th>
-                            <th class="th" id="th_servings" data-sort="servings" data-asc="true"># of Servings <span></span></th>
-                            <th class="th" id="th_time" data-sort="total_time" data-asc="true">Total time <span></span></th>
-                            <th>Recipe Source <span></span></th>
+                            <td><a href="{{ recipe.get_absolute_url }}">{{ recipe }}</a></td>
+                            <td>{{ recipe.servings }}</td>
+                            <td>{{ recipe.total_time }}</td>
+                            <td>
+                                {% if recipe.link %}
+                                    <a href="{{ recipe.link }}">{{ recipe.link }}</a>
+                                {% else %}
+                                    {{ recipe.source }}
+                                {% endif %}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for recipe in recipes_submitted %}
-                            <tr>
-                                <td><a href="{{ recipe.get_absolute_url }}">{{ recipe }}</a></td>
-                                <td>{{ recipe.servings }}</td>
-                                <td>{{ recipe.total_time }}</td>
-                                <td>
-                                    {% if recipe.link %}
-                                        <a href="{{ recipe.link }}">{{ recipe.link }}</a>
-                                    {% else %}
-                                        {{ recipe.source }}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% endif %}
 {% endblock %}
