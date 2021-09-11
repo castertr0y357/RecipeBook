@@ -16,3 +16,9 @@
     padding: 5px;
 
 }
+
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}

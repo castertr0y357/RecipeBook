@@ -272,9 +272,12 @@ class CategoryListView(SearchMixin, ListView):
 
             if query is not None:
                 for obj in query:
-                    url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
-                    json_data = {"name": url_link, "recipe_count": obj.recipe_count}
-                    data.append(json_data)
+                    if obj.recipe_count > 0:
+                        url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
+                        json_data = {"name": url_link, "recipe_count": obj.recipe_count}
+                        data.append(json_data)
+                    else:
+                        pass
 
             return JsonResponse(data=data, safe=False)
         else:
@@ -363,6 +366,7 @@ class RecipeDetailView(SearchMixin, DetailView):
         recipe = self.get_object()
         recipe.ingredients = recipe.ingredients_list.split('\n')
         recipe.directions = recipe.directions.split('\n')
+        recipe.notes = recipe.notes.split('\n')
         recipe.prep_time = format_time(recipe.prep_time)
         recipe.cook_time = format_time(recipe.cook_time)
 
@@ -378,7 +382,8 @@ class RecipeDetailView(SearchMixin, DetailView):
     def get(self, request, *args, **kwargs):
         if self.request.is_ajax():
             resize_value = self.request.GET.get('resize_value')
-            recipe = Recipe.objects.get(id=self.get_object())
+            print(self.get_object().id)
+            recipe = Recipe.objects.get(id=self.get_object().id)
 
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
@@ -406,7 +411,8 @@ class RecipeEditView(SearchMixin, UserPassesTestMixin, DetailView):
         recipe_edit_form = RecipeForm(initial={'recipe_name': recipe.name, 'ingredients_list': recipe.ingredients_list,
                                                'directions': recipe.directions, 'prep_time': recipe.prep_time,
                                                'cook_time': recipe.cook_time, 'servings': recipe.servings,
-                                               'source': recipe.source, 'category_input': recipe.categories_list})
+                                               'notes': recipe.notes, 'source': recipe.source,
+                                               'category_input': recipe.categories_list})
         context['recipe'] = recipe
         context['recipe_edit_form'] = recipe_edit_form
         return context
@@ -426,6 +432,7 @@ class RecipeEditView(SearchMixin, UserPassesTestMixin, DetailView):
                 servings = edit_form.cleaned_data['servings']
                 prep_time = edit_form.cleaned_data['prep_time']
                 cook_time = edit_form.cleaned_data['cook_time']
+                notes = edit_form.cleaned_data['notes']
                 source = edit_form.cleaned_data['source']
                 categories = edit_form.cleaned_data['category_input']
                 categories_list = []
@@ -438,12 +445,13 @@ class RecipeEditView(SearchMixin, UserPassesTestMixin, DetailView):
                     categories_list.append(categories)
 
                 recipe = self.update_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
-                                            categories_list)
+                                            notes, categories_list)
                 return redirect('RecipeBook:view_recipe', slug=recipe.slug)
             else:
                 return render('RecipeBook:edit_recipe', {'form': edit_form})
 
-    def update_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, categories):
+    def update_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, notes,
+                      categories):
         recipe = self.get_object()
         recipe.name = name
         recipe.ingredients_list = ingredients_list
@@ -452,6 +460,7 @@ class RecipeEditView(SearchMixin, UserPassesTestMixin, DetailView):
         recipe.prep_time = prep_time
         recipe.cook_time = cook_time
         recipe.source = source
+        recipe.notes = notes
         recipe.slug = name + "-" + str(recipe.id)
 
         while True:
@@ -520,6 +529,7 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
                 prep_time = add_form.cleaned_data['prep_time']
                 cook_time = add_form.cleaned_data['cook_time']
                 source = add_form.cleaned_data['source']
+                notes = add_form.cleaned_data['source']
                 submitter = request.user
                 categories = add_form.cleaned_data['category_input']
                 categories_list = []
@@ -533,14 +543,14 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
                 print(categories_list)
 
                 recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
-                                            categories_list, submitter)
+                                            notes, categories_list, submitter)
 
                 return redirect('RecipeBook:view_recipe', slug=recipe.slug)
             else:
                 return render('RecipeBook:add_recipe', {'form': add_form})
 
-    def create_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, categories,
-                      submitter):
+    def create_recipe(self, name, ingredients_list, directions, servings, prep_time, cook_time, source, notes,
+                      categories, submitter):
         while True:
             try:
                 recipe = Recipe.objects.create(name=name,
@@ -550,6 +560,7 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
                                                prep_time=prep_time,
                                                cook_time=cook_time,
                                                source=source,
+                                               notes=notes,
                                                submitter=submitter)
                 break
             except db.utils.OperationalError:

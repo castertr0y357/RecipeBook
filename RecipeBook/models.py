@@ -24,6 +24,7 @@ class Recipe(models.Model):
     cook_time = models.IntegerField(default=0, null=True, blank=True)
     directions = models.TextField(default="")
     source = models.CharField(max_length=100, default="", null=True, blank=True)
+    notes = models.TextField(default="")
     categories = models.ManyToManyField(Category, blank=True)
     submitter = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     slug = models.CharField(max_length=200, default="")
@@ -33,3 +34,9 @@ class Recipe(models.Model):
 
     def get_absolute_url(self):
         return reverse('RecipeBook:view_recipe', args=[str(self.slug)])
+
+
+class Favorite(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

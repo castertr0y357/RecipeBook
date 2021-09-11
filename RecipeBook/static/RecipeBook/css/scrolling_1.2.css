@@ -1,0 +1,32 @@
+.scrolling {
+    overflow-y: auto;
+    overflow-x: auto;
+    scroll-margin: 0;
+    max-height: 300px;
+    max-width: max-content;
+}
+
+.scrolling div {
+    width: auto;
+}
+
+.scrolling thead, th {
+    position: sticky;
+    top: 0;
+}
+
+.long_scrolling {
+    overflow-y: auto;
+    scroll-margin: 0;
+    max-height: 80vh;
+    max-width: max-content;
+}
+
+.long_scrolling div {
+    width: auto;
+}
+
+.long_scrolling thead, th {
+    position: sticky;
+    top: 0;
+}
