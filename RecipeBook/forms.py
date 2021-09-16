@@ -19,13 +19,13 @@ class SearchForm(forms.Form):
 
 
 class RecipeForm(forms.Form):
-    recipe_name = forms.CharField(widget=forms.TextInput(attrs={
-        'size': 110, 'placeholder': 'Really awesome recipe name'}),
+    recipe_name = forms.CharField(widget=forms.TextInput(attrs={'size': 110, 'autofocus': True,
+                                                                'placeholder': 'Really awesome recipe name'}),
                                   label='Name',
                                   required=True,
                                   initial='')
     ingredients_list = forms.CharField(widget=forms.Textarea(attrs={
-        'cols': '50', 'rows': '15', 'placeholder': 'Enter ingredients, one per line'}),
+        'cols': '100', 'rows': '15', 'placeholder': 'Enter ingredients, one per line'}),
                                        label='Ingredients',
                                        required=True,
                                        initial='')
@@ -52,12 +52,12 @@ class RecipeForm(forms.Form):
                             required=False,
                             initial='')
     source = forms.CharField(widget=forms.TextInput(attrs={
-        'size': '40', 'placeholder': 'Ex: Family recipe book or www.site.com/recipe'}),
+        'size': '100', 'placeholder': 'Ex: Family recipe book or www.site.com/recipe'}),
                              label='Source',
                              required=False,
                              initial='')
     category_input = forms.CharField(widget=forms.TextInput(attrs={
-        'size': '40', 'placeholder': 'Comma separated list. Ex: Chicken, stew'}),
+        'size': '100', 'placeholder': 'Comma separated list. Ex: Chicken, stew'}),
                                      label='Categories',
                                      required=True,
                                      initial='')
@@ -77,7 +77,7 @@ class AccountCreationForm(UserCreationForm, forms.Form):
         required=True,
         initial='')
     first_name = forms.CharField(widget=forms.TextInput(attrs={
-        'size': '20'}),
+        'size': '40'}),
         label='First Name',
         required=True,
         initial='')
