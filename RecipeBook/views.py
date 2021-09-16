@@ -183,11 +183,15 @@ class CreateUserView(SearchMixin, FormView):
 
 class LoginView(SearchMixin, auth_views.LoginView):
     template_name = 'registration/login.html'
+    redirect_field_name = "redirect"
+    redirect_authenticated_user = True
     form = AuthenticationForm
 
     def get_context_data(self, **kwargs):
         context = super(LoginView, self).get_context_data()
         context['login_form'] = self.form
+        if self.request.GET.get('next'):
+            context['redirect'] = self.request.GET.get('next')
         return context
 
 
