@@ -22,7 +22,9 @@ class SearchMixin(View):
     search = SearchForm
 
     def get_context_data(self, **kwargs):
+        print(self.search.autofocus)
         context = {'search_form': self.search}
+        print(self.search.autofocus)
         return context
 
 
@@ -137,6 +139,7 @@ class CreateUserView(SearchMixin, FormView):
     account_form = AccountCreationForm
 
     def get_context_data(self, *args, **kwargs):
+        self.search.autofocus = False
         context = super(CreateUserView, self).get_context_data()
         context['account_form'] = self.account_form
         return context
@@ -189,6 +192,7 @@ class LoginView(SearchMixin, auth_views.LoginView):
 
     def get_context_data(self, **kwargs):
         context = super(LoginView, self).get_context_data()
+        self.search.autofocus = False
         context['login_form'] = self.form
         if self.request.GET.get('next'):
             context['redirect'] = self.request.GET.get('next')
@@ -205,6 +209,7 @@ class PasswordChangeView(SearchMixin, auth_views.PasswordChangeView):
 
     def get_context_data(self, **kwargs):
         context = super(PasswordChangeView, self).get_context_data()
+        self.search.autofocus = False
         context['password_change_form'] = self.form(user=self.request.user)
         return context
 
@@ -403,8 +408,8 @@ class RecipeEditView(SearchMixin, UserPassesTestMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(RecipeEditView, self).get_context_data()
+        self.search.autofocus = False
         recipe = self.get_object()
-        print(recipe.name)
         recipe.categories_list = ""
         categories = Category.objects.filter(recipe=recipe)
         for category in categories:
@@ -516,6 +521,7 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
     form_class = RecipeForm
 
     def get_context_data(self, *args, **kwargs):
+        self.search.autofocus = False
         context = super(RecipeAddView, self).get_context_data()
         # context['recipe_add_form'] = RecipeForm(initial={'prep_time': '', 'cook_time': '', 'servings': ''})
         context['recipe_add_form'] = RecipeForm()
@@ -533,7 +539,7 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
                 prep_time = add_form.cleaned_data['prep_time']
                 cook_time = add_form.cleaned_data['cook_time']
                 source = add_form.cleaned_data['source']
-                notes = add_form.cleaned_data['source']
+                notes = add_form.cleaned_data['notes']
                 submitter = request.user
                 categories = add_form.cleaned_data['category_input']
                 categories_list = []
