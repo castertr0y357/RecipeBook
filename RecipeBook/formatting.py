@@ -24,6 +24,9 @@ def format_volume(volume, units, multiplier):
                  "pound", "lb"]
     new_volume = ""
     if units in unit_list:
+        unit = None
+        cups = None
+        pounds = None
         if "c" in str(units).lower():
             unit = "cup"
             cups = Fraction(volume)
@@ -40,5 +43,11 @@ def format_volume(volume, units, multiplier):
             unit = "lb"
             pounds = Fraction(volume)
 
+        if cups is not None:
+            new_cups = cups * multiplier
+            new_volume = str(new_cups + " " + unit)
+        elif pounds is not None:
+            new_pounds = pounds * multiplier
+            new_volume = str(new_pounds + " " + unit)
 
     return new_volume
