@@ -43,11 +43,41 @@ def format_volume(volume, units, multiplier):
             unit = "lb"
             pounds = Fraction(volume)
 
+        whole_number = 0
         if cups is not None:
             new_cups = cups * multiplier
-            new_volume = str(new_cups + " " + unit)
+            while new_cups >= 1:
+                whole_number += 1
+                new_cups -= 1
+            if new_cups < Fraction(1/8):
+                new_cups = new_cups * 16
+                unit = "tbsp"
+            elif new_cups < Fraction(1/16):
+                new_cups = new_cups * 48
+                unit = "tsp"
+            if whole_number > 0:
+                new_volume += str(whole_number) + " " + unit + " "
+            elif new_cups > 0:
+                new_volume += str(new_cups) + " " + unit
         elif pounds is not None:
             new_pounds = pounds * multiplier
-            new_volume = str(new_pounds + " " + unit)
+            while new_pounds >= 1:
+                whole_number += 1
+                new_pounds -= 1
+            if whole_number > 0:
+                new_volume += str(whole_number) + " " + unit + " "
+            if new_pounds > 0:
+                new_pounds = new_pounds * 16
+                unit = "oz"
+                new_volume += str(new_pounds) + " " + unit
+    else:
+        # handle ingredients that use words like whole, half, quarter, etc... or things that don't use a unit of measure
+        pass
 
     return new_volume
+
+
+def parse_ingredient(ingredient):
+    ingredient_listable = str(ingredient).split(' ')
+    for item in ingredient_listable:
+
