@@ -78,6 +78,29 @@ def format_volume(volume, units, multiplier):
 
 
 def parse_ingredient(ingredient):
+    unit = None
+    value = None
+    unit_list = ["cups", "cup", "tablespoons", "tbsp", "tablespoon", "teaspoons", "tsp", "teaspoon", "pounds", "lbs",
+                 "pound", "lb"]
     ingredient_listable = str(ingredient).split(' ')
     for item in ingredient_listable:
+        if str(item) in unit_list:
+            if unit is None:
+                unit = unit_list.index(item)
+            else:
+                pass
+        elif "/" in item:
+            if value is None:
+                if ingredient_listable.index(item) > 0:
+                    value = ingredient_listable[ingredient_listable.index(item) - 1] + item
+                else:
+                    value = item
+            else:
+                pass
+        elif item.isdigit():
+            if value is None:
+                value = item
+            else:
+                pass
 
+    return value, unit
