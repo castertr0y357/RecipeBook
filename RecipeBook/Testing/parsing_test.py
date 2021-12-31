@@ -1,5 +1,8 @@
 from fractions import Fraction
 
+if Fraction(1/2) > 0:
+    print(True)
+
 ingredient_1 = "1 1/2 cups flour"
 ingredient_2 = "1/4 cups of sugar"
 ingredient_3 = "3 tablespoons of salt"

@@ -22,6 +22,15 @@ def format_time(time_minutes):
 def format_volume(volume, units, multiplier):
     unit_list = ["cups", "cup", "tablespoons", "tbsp", "tablespoon", "teaspoons", "tsp", "teaspoon", "pounds", "lbs",
                  "pound", "lb"]
+    if "/" in volume and " " in volume:
+        split_volume = volume.split(" ")
+        whole_number = Fraction(split_volume[0])
+        fraction = Fraction(split_volume[1])
+        volume = Fraction(whole_number + fraction)
+    else:
+        volume = Fraction(volume)
+
+    multiplier = Fraction(multiplier)
     new_volume = ""
     if units in unit_list:
         unit = None
@@ -45,22 +54,23 @@ def format_volume(volume, units, multiplier):
 
         whole_number = 0
         if cups is not None:
-            new_cups = cups * multiplier
+            new_cups = Fraction(cups * multiplier)
+            if new_cups < Fraction(1/16):
+                new_cups = new_cups * 48
+                unit = "tsp"
+            elif new_cups < Fraction(1/8):
+                new_cups = new_cups * 16
+                unit = "tbsp"
             while new_cups >= 1:
                 whole_number += 1
                 new_cups -= 1
-            if new_cups < Fraction(1/8):
-                new_cups = new_cups * 16
-                unit = "tbsp"
-            elif new_cups < Fraction(1/16):
-                new_cups = new_cups * 48
-                unit = "tsp"
             if whole_number > 0:
-                new_volume += str(whole_number) + " " + unit + " "
-            elif new_cups > 0:
-                new_volume += str(new_cups) + " " + unit
+                new_volume += str(whole_number) + " "
+            if new_cups > 0:
+                new_volume += str(new_cups) + " "
+            new_volume += unit
         elif pounds is not None:
-            new_pounds = pounds * multiplier
+            new_pounds = Fraction(pounds * multiplier)
             while new_pounds >= 1:
                 whole_number += 1
                 new_pounds -= 1
@@ -80,27 +90,25 @@ def format_volume(volume, units, multiplier):
 def parse_ingredient(ingredient):
     unit = None
     value = None
+    ingredient_remainder = ""
     unit_list = ["cups", "cup", "tablespoons", "tbsp", "tablespoon", "teaspoons", "tsp", "teaspoon", "pounds", "lbs",
                  "pound", "lb"]
     ingredient_listable = str(ingredient).split(' ')
     for item in ingredient_listable:
         if str(item) in unit_list:
             if unit is None:
-                unit = unit_list.index(item)
-            else:
-                pass
+                unit = unit_list[unit_list.index(item)]
         elif "/" in item:
-            if value is None:
-                if ingredient_listable.index(item) > 0:
-                    value = ingredient_listable[ingredient_listable.index(item) - 1] + item
-                else:
-                    value = item
-            else:
-                pass
-        elif item.isdigit():
             if value is None:
                 value = item
             else:
-                pass
+                value += (" " + item)
+        elif item.isdigit():
+            if value is None:
+                value = item
+        else:
+            ingredient_remainder += str(item)
+            if item != ingredient_listable[-1]:
+                ingredient_remainder += " "
 
-    return value, unit
+    return value, unit, ingredient_remainder

@@ -8,7 +8,7 @@ $(document).ready(function(){
         $.ajax({
             type: 'GET',
             url: url,
-            data:{resize_value: value},
+            data:{resize_value: value, ingredients_list: ingredients},
             dataType: 'json',
             
         })

@@ -13,7 +13,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 # Local imports
 from .models import Category, Recipe
 from .forms import SearchForm, RecipeForm, AccountCreationForm, RecipeResizingForm
-from .formatting import format_time
+from .formatting import format_time, parse_ingredient, format_volume
 from urllib.parse import urlencode
 
 
@@ -386,13 +386,27 @@ class RecipeDetailView(SearchMixin, DetailView):
 
         context['recipe'] = recipe
         context['resize_form'] = resize_form
+
+        for ingredient in recipe.ingredients:
+            parsed_value, parsed_unit, ingredient_remainder = parse_ingredient(ingredient)
+            print("original ingredient:", ingredient)
+            resized_value = format_volume(parsed_value, parsed_unit, 1/3)
+            print("resized value:", resized_value, ingredient_remainder)
         return context
 
     def get(self, request, *args, **kwargs):
         if self.request.is_ajax():
             resize_value = self.request.GET.get('resize_value')
-            print(self.get_object().id)
-            recipe = Recipe.objects.get(id=self.get_object().id)
+            recipe = self.get_object()
+            ingredients = recipe.ingredients_list.split('\n')
+            new_ingredients = []
+            for ingredient in ingredients:
+                parsed_value, parsed_unit, ingredient_remainder = parse_ingredient(ingredient)
+                print("parsed value:", parsed_value, "parsed_unit:", parsed_unit, "original ingredient:", ingredient)
+                new_value = format_volume(parsed_value, parsed_unit, resize_value)
+                resized_ingredient = str(new_value) + " " + str(ingredient_remainder)
+                new_ingredients.append(resized_ingredient)
+                print(resized_ingredient)
 
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
