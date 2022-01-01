@@ -120,7 +120,7 @@ class AccountCreationForm(UserCreationForm, forms.Form):
 
 class RecipeResizingForm(forms.Form):
     """Form to modify ingredients based on desired recipe servings"""
-    CHOICES = [(2/1, "Double"), (1/2, "1/2"), (1/3, "1/3"), (1/4, "1/4")]
+    CHOICES = [(2/1, "Double"), (2/3, "2/3"), (1/2, "1/2"), (1/3, "1/3"), (1/4, "1/4")]
     default_recipe_sizes = forms.ChoiceField(choices=CHOICES,
                                              widget=forms.RadioSelect,
                                              label="Recipe Sizing")

@@ -387,11 +387,6 @@ class RecipeDetailView(SearchMixin, DetailView):
         context['recipe'] = recipe
         context['resize_form'] = resize_form
 
-        for ingredient in recipe.ingredients:
-            parsed_value, parsed_unit, ingredient_remainder = parse_ingredient(ingredient)
-            print("original ingredient:", ingredient)
-            resized_value = format_volume(parsed_value, parsed_unit, 2)
-            print("resized value:", resized_value, ingredient_remainder)
         return context
 
     def get(self, request, *args, **kwargs):
