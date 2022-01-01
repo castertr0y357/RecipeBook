@@ -30,7 +30,7 @@ def format_volume(volume, units, multiplier):
     else:
         volume = Fraction(volume)
 
-    multiplier = Fraction(multiplier)
+    multiplier = Fraction(multiplier).limit_denominator(10)
     new_volume = ""
     if units in unit_list:
         unit = None
@@ -42,6 +42,7 @@ def format_volume(volume, units, multiplier):
         elif any(x in str(units).lower() for x in ["tbsp", "tablespoon"]):
             unit = "tbsp"
             cups = Fraction(volume / 16)
+            print("tbsp value:", cups)
         elif any(x in str(units).lower() for x in ["tsp", "teaspoon"]):
             unit = "tsp"
             cups = Fraction(volume / 48)
@@ -55,12 +56,15 @@ def format_volume(volume, units, multiplier):
         whole_number = 0
         if cups is not None:
             new_cups = Fraction(cups * multiplier)
+            print("new cups:", new_cups)
             if new_cups < Fraction(1/16):
                 new_cups = new_cups * 48
                 unit = "tsp"
             elif new_cups < Fraction(1/8):
                 new_cups = new_cups * 16
                 unit = "tbsp"
+            else:
+                unit = "cup"
             while new_cups >= 1:
                 whole_number += 1
                 new_cups -= 1

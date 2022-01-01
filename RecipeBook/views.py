@@ -390,7 +390,7 @@ class RecipeDetailView(SearchMixin, DetailView):
         for ingredient in recipe.ingredients:
             parsed_value, parsed_unit, ingredient_remainder = parse_ingredient(ingredient)
             print("original ingredient:", ingredient)
-            resized_value = format_volume(parsed_value, parsed_unit, 1/3)
+            resized_value = format_volume(parsed_value, parsed_unit, 2)
             print("resized value:", resized_value, ingredient_remainder)
         return context
 
