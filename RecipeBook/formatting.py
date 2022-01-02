@@ -67,6 +67,9 @@ def format_volume(volume, units, multiplier):
                 whole_number += 1
                 new_cups -= 1
             if whole_number > 0:
+                if unit == "cup":
+                    if whole_number > 1:
+                        unit = "cups"
                 new_volume += str(whole_number) + " "
             if new_cups > 0:
                 new_volume += str(new_cups) + " "
@@ -77,6 +80,8 @@ def format_volume(volume, units, multiplier):
                 whole_number += 1
                 new_pounds -= 1
             if whole_number > 0:
+                if whole_number > 1:
+                    unit = "lbs"
                 new_volume += str(whole_number) + " " + unit + " "
             if new_pounds > 0:
                 new_pounds = new_pounds * 16

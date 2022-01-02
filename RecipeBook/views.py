@@ -22,9 +22,7 @@ class SearchMixin(View):
     search = SearchForm
 
     def get_context_data(self, **kwargs):
-        print(self.search.autofocus)
         context = {'search_form': self.search}
-        print(self.search.autofocus)
         return context
 
 
@@ -392,17 +390,23 @@ class RecipeDetailView(SearchMixin, DetailView):
     def get(self, request, *args, **kwargs):
         if self.request.is_ajax():
             resize_value = self.request.GET.get('resize_value')
+            function_type = self.request.GET.get('function_type')
             recipe = self.get_object()
+            data = []
             ingredients = recipe.ingredients_list.split('\n')
-            new_ingredients = []
-            for ingredient in ingredients:
-                parsed_value, parsed_unit, ingredient_remainder = parse_ingredient(ingredient)
-                print("parsed value:", parsed_value, "parsed_unit:", parsed_unit, "original ingredient:", ingredient)
-                new_value = format_volume(parsed_value, parsed_unit, resize_value)
-                resized_ingredient = str(new_value) + " " + str(ingredient_remainder)
-                new_ingredients.append(resized_ingredient)
-                print(resized_ingredient)
+            if function_type == "resize":
+                for ingredient in ingredients:
+                    parsed_value, parsed_unit, ingredient_remainder = parse_ingredient(ingredient)
+                    new_value = format_volume(parsed_value, parsed_unit, resize_value)
+                    resized_ingredient = str(new_value) + " " + str(ingredient_remainder)
+                    json_data = {"ingredient": resized_ingredient}
+                    data.append(json_data)
+            elif function_type == "reset":
+                for ingredient in ingredients:
+                    json_data = {"ingredient": ingredient}
+                    data.append(json_data)
 
+            return JsonResponse(data=data, safe=False)
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
 
