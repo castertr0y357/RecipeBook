@@ -20,8 +20,8 @@ def format_time(time_minutes):
 
 
 def format_volume(volume, units, multiplier):
-    unit_list = ["cups", "cup", "tablespoons", "tbsp", "tablespoon", "teaspoons", "tsp", "teaspoon", "pounds", "lbs",
-                 "pound", "lb"]
+    unit_list = ["cups", "cup", "tablespoons", "tablespoon", "tbsp", "tbsps", "teaspoons", "teaspoon", "tsp", "tsps",
+                 "pounds", "lbs", "pound", "lb", "fl ozs", "fl oz", "oz", "ozs", "ounce", "ounces"]
     if "/" in volume and " " in volume:
         split_volume = volume.split(" ")
         whole_number = Fraction(split_volume[0])
@@ -39,16 +39,16 @@ def format_volume(volume, units, multiplier):
         if "c" in str(units).lower():
             unit = "cup"
             cups = Fraction(volume)
-        elif any(x in str(units).lower() for x in ["tbsp", "tablespoon"]):
+        elif any(x in str(units).lower() for x in ["tbsp", "tbsps", "tablespoon", "tablespoons"]):
             unit = "tbsp"
             cups = Fraction(volume / 16)
-        elif any(x in str(units).lower() for x in ["tsp", "teaspoon"]):
+        elif any(x in str(units).lower() for x in ["tsp", "tsps", "teaspoon", "teaspoons"]):
             unit = "tsp"
             cups = Fraction(volume / 48)
-        elif any(x in str(units).lower() for x in ["fl oz", "oz", "ounce"]):
+        elif any(x in str(units).lower() for x in ["fl oz", "fl ozs", "oz", "ozs", "ounce", "ounces"]):
             unit = "oz"
             cups = Fraction(volume / 8)
-        elif any(x in str(units).lower() for x in ["pound", "lb"]):
+        elif any(x in str(units).lower() for x in ["pound", "pounds", "lb", "lbs"]):
             unit = "lb"
             pounds = Fraction(volume)
 
@@ -99,7 +99,7 @@ def parse_ingredient(ingredient):
     value = None
     ingredient_remainder = ""
     unit_list = ["cups", "cup", "tablespoons", "tbsp", "tablespoon", "teaspoons", "tsp", "teaspoon", "pounds", "lbs",
-                 "pound", "lb"]
+                 "pound", "lb", "fl oz", "oz", "ozs", "ounce", "ounces"]
     ingredient_listable = str(ingredient).split(' ')
     for item in ingredient_listable:
         if str(item) in unit_list:
