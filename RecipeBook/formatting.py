@@ -47,9 +47,12 @@ def format_volume(volume, units, multiplier):
         elif any(x in str(units).lower() for x in ["tsp", "tsps", "teaspoon", "teaspoons"]):
             unit = "tsp"
             cups = Fraction(volume / 48)
-        elif any(x in str(units).lower() for x in ["fl oz", "fl ozs", "oz", "ozs", "ounce", "ounces"]):
+        elif any(x in str(units).lower() for x in ["fl oz", "fl ozs"]):
             unit = "oz"
             cups = Fraction(volume / 8)
+        elif any(x in str(units).lower() for x in ["oz", "ozs", "ounce", "ounces"]):
+            unit = "oz"
+            pounds = Fraction(volume / 16)
         elif any(x in str(units).lower() for x in ["pound", "pounds", "lb", "lbs"]):
             unit = "lb"
             pounds = Fraction(volume)
