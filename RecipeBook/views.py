@@ -466,6 +466,24 @@ class RecipeEditView(SearchMixin, UserPassesTestMixin, DetailView):
                 else:
                     categories_list.append(categories)
 
+                new_list = ''
+                for char in ingredients_list:
+                    if char == '½':
+                        new_list += '1/2'
+                    elif char == '¼':
+                        new_list += '1/4'
+                    elif char == '¾':
+                        new_list += '3/4'
+                    elif char == '⅓':
+                        new_list += '1/3'
+                    elif char == '⅔':
+                        new_list += '2/3'
+                    elif char == '⅛':
+                        new_list += '1/8'
+                    else:
+                        new_list += char
+                ingredients_list = new_list
+
                 recipe = self.update_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
                                             notes, categories_list)
                 return redirect('RecipeBook:view_recipe', slug=recipe.slug)
@@ -563,7 +581,24 @@ class RecipeAddView(SearchMixin, LoginRequiredMixin, FormView):
                         categories_list.append(category)
                 else:
                     categories_list.append(categories)
-                print(categories_list)
+
+                new_list = ''
+                for char in ingredients_list:
+                    if char == '½':
+                        new_list += '1/2'
+                    elif char == '¼':
+                        new_list += '1/4'
+                    elif char == '¾':
+                        new_list += '3/4'
+                    elif char == '⅓':
+                        new_list += '1/3'
+                    elif char == '⅔':
+                        new_list += '2/3'
+                    elif char == '⅛':
+                        new_list += '1/8'
+                    else:
+                        new_list += char
+                ingredients_list = new_list
 
                 recipe = self.create_recipe(name, ingredients_list, directions, servings, prep_time, cook_time, source,
                                             notes, categories_list, submitter)
