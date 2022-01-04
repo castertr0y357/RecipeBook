@@ -33,12 +33,13 @@ def format_volume(volume, units, multiplier):
 
     multiplier = Fraction(multiplier).limit_denominator(10)
     new_volume = ""
-    # if units is not None:
     if units in unit_list:
         unit = None
         cups = None
         pounds = None
-        if "c" in str(units).lower():
+        print(units)
+        # problem for ounces
+        if any(x in str(units).lower() for x in ["cup", "cups"]):
             unit = "cup"
             cups = Fraction(volume)
         elif any(x in str(units).lower() for x in ["tbsp", "tbsps", "tablespoon", "tablespoons"]):
@@ -47,10 +48,12 @@ def format_volume(volume, units, multiplier):
         elif any(x in str(units).lower() for x in ["tsp", "tsps", "teaspoon", "teaspoons"]):
             unit = "tsp"
             cups = Fraction(volume / 48)
-        elif any(x in str(units).lower() for x in ["fl oz", "fl ozs"]):
+        elif any(x in str(units).lower() for x in ["fl oz", "fl ozs", "fluid"]):
+            print("cups")
             unit = "oz"
             cups = Fraction(volume / 8)
         elif any(x in str(units).lower() for x in ["oz", "ozs", "ounce", "ounces"]):
+            print("pounds")
             unit = "oz"
             pounds = Fraction(volume / 16)
         elif any(x in str(units).lower() for x in ["pound", "pounds", "lb", "lbs"]):
@@ -81,17 +84,24 @@ def format_volume(volume, units, multiplier):
             new_volume += unit
         elif pounds is not None:
             new_pounds = Fraction(pounds * multiplier)
+            whole_ounces = 0
             while new_pounds >= 1:
                 whole_number += 1
                 new_pounds -= 1
-            if whole_number > 0:
-                if whole_number > 1:
-                    unit = "lbs"
+            if whole_number >= 1:
+                unit = "lbs"
                 new_volume += str(whole_number) + " " + unit + " "
             if new_pounds > 0:
                 new_pounds = new_pounds * 16
+                while new_pounds >= 1:
+                    whole_ounces += 1
+                    new_pounds -= 1
                 unit = "oz"
-                new_volume += str(new_pounds) + " " + unit
+                if whole_ounces > 0:
+                    new_volume += str(whole_ounces) + " "
+                if new_pounds > 0:
+                    new_volume += str(new_pounds) + " "
+                new_volume += unit
     else:
         # handle ingredients that use words like whole, half, quarter, etc... or things that don't use a unit of measure
         size_descriptions = ["whole", "half", "third", "quarter"]
@@ -118,7 +128,7 @@ def parse_ingredient(ingredient):
     value = None
     ingredient_remainder = ""
     unit_list = ["cups", "cup", "tablespoons", "tbsp", "tablespoon", "teaspoons", "tsp", "teaspoon", "pounds", "lbs",
-                 "pound", "lb", "fl oz", "oz", "ozs", "ounce", "ounces", "whole", "half", "third", "quarter"]
+                 "pound", "lb", "fl oz", "fluid", "oz", "ozs", "ounce", "ounces", "whole", "half", "third", "quarter"]
     ingredient_listable = str(ingredient).split(' ')
     for item in ingredient_listable:
         if str(item) in unit_list:
