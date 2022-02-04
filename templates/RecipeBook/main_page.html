@@ -29,7 +29,7 @@
                         <h4>Most Recent Recipes:</h4>
                         <ol style="text-align: left">
                             {% for recipe in recipes %}
-                                <li><a href="{% url 'RecipeBook:view_recipe' recipe %}">{{ recipe }}</a></li>
+                                <li><a href="{% url 'RecipeBook:view_recipe' recipe.slug %}">{{ recipe }}</a></li>
                             {% endfor %}
                         </ol>
                     </div>
