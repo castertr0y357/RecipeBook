@@ -2,7 +2,7 @@
 
 {% block head %}
     {% load static %}
-    <link rel="stylesheet" href="{% static "RecipeBook/css/stats_1.0.css" %}"/>
+    <link rel="stylesheet" href="{% static "RecipeBook/css/stats_1.3.css" %}"/>
 {% endblock head %}
 
 {% block body %}
@@ -12,17 +12,27 @@
             <tr>
                 <td class="stats">
                     <h2>Categories: {{ categories.count }} total categories</h2>
-                    {% if categories.count > 0 %}
-                        <h4>Latest Category: <a href="{% url 'RecipeBook:category_detail' categories.recent.slug %}">{{ categories.recent }}</a></h4>
-                    {% endif %}
+                    <div style="align-self: center; width: fit-content; text-align: center; margin: auto">
+                        <h4>Most Popular Categories:</h4>
+                        <ol style="text-align: left;">
+                            {% for category in categories %}
+                                <li><a href="{% url 'RecipeBook:category_detail' category.slug %}">{{ category }}</a></li>
+                            {% endfor %}
+                        </ol>
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td class="stats">
                     <h2>Recipes: {{ recipes.count }} total recipes</h2>
-                    {% if recipes.count > 0 %}
-                        <h4>Latest Recipe: <a href="{% url 'RecipeBook:view_recipe' recipes.recent.slug %}">{{ recipes.recent }}</a></h4>
-                    {% endif %}
+                    <div style="align-self: center; width: fit-content; text-align: center; margin: auto">
+                        <h4>Most Recent Recipes:</h4>
+                        <ol style="text-align: left">
+                            {% for recipe in recipes %}
+                                <li><a href="{% url 'RecipeBook:view_recipe' recipe %}">{{ recipe }}</a></li>
+                            {% endfor %}
+                        </ol>
+                    </div>
                 </td>
             </tr>
         </table>

@@ -41,12 +41,8 @@ class MainView(SearchMixin, ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(MainView, self).get_context_data()
-        categories = Category.objects.all()
-        if categories.count() > 0:
-            categories.recent = categories[categories.count() - 1]
-        recipes = Recipe.objects.all()
-        if recipes.count() > 0:
-            recipes.recent = recipes[recipes.count() - 1]
+        categories = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by('recipe_count')[:5]
+        recipes = Recipe.objects.all().reverse()[:10]
 
         context['categories'] = categories
         context['recipes'] = recipes
