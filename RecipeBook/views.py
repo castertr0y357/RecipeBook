@@ -42,7 +42,7 @@ class MainView(SearchMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         context = super(MainView, self).get_context_data()
         categories = Category.objects.all().annotate(recipe_count=Count('recipe')).order_by('recipe_count')[:5]
-        recipes = Recipe.objects.all().reverse()[:-10]
+        recipes = Recipe.objects.all().order_by('-id')[:10]
 
         context['categories'] = categories
         context['recipes'] = recipes
