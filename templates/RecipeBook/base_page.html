@@ -26,39 +26,46 @@
     {% endblock head %}
 </head>
 <body>
-    <header id="nav_header" style="background: white; border-bottom: dashed 1px #000000">
-        <div class="menu" id="site_nav">
-            <ul class="nav" id="menu" style="display: inline">
-                <li><a href="{% url 'RecipeBook:main' %}">Home</a></li>
-                {# <li><a href="{% url 'RecipeBook:aboutPage' %}">About</a></li> #}
-                <li><a href="{% url 'RecipeBook:category_list' %}">Categories</a></li>
-                <li><a href="{% url 'RecipeBook:add_recipe' %}">Add Recipe</a></li>
-                <li><a href="{% url 'RecipeBook:shopping_list' %}">Shopping List</a></li>
-                <li><a href="{% url 'RecipeBook:meal_planner' %}">Meal Planner</a></li>
-                <li style="float: right">
-                    <ul style="display: inline">
-                        <li>
-                            {% if user.is_authenticated %}
-                                Welcome <a href="{% url 'RecipeBook:profile_detail' user.username %}">{{ user }}</a> | <a href="{% url 'RecipeBook:logout' %}">Logout</a>
-                            {% else %}
-                                <a href="{% url 'RecipeBook:login' %}">Login</a> | <a href="{% url 'RecipeBook:create_user' %}">Create Account</a>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <form action="{% url 'RecipeBook:search_results' %}" method="post" name="search" title="Search">
-                                {% csrf_token %}
-                                {{ search_form }}
-                                <input type="submit" value="search">
-                            </form>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </header>
+    <table>
+        <tr style="width: 100%">
+            <td style="width: 100%">
+                <header id="nav_header" style="background: white; border-bottom: dashed 1px #000000">
+                    <div class="menu" id="site_nav">
+                        <ul class="nav" id="menu" style="display: inline">
+                            <li><a href="{% url 'RecipeBook:main' %}">Home</a></li>
+                            {# <li><a href="{% url 'RecipeBook:aboutPage' %}">About</a></li> #}
+                            <li><a href="{% url 'RecipeBook:category_list' %}">Categories</a></li>
+                            <li><a href="{% url 'RecipeBook:add_recipe' %}">Add Recipe</a></li>
+                            <li><a href="{% url 'RecipeBook:shopping_list' %}">Shopping List</a></li>
+                            <li><a href="{% url 'RecipeBook:meal_planner' %}">Meal Planner</a></li>
+                        </ul>
+                        <ul class="nav" id="menu_2" style="display: inline; float: right">
+                            <li>
+                                {% if user.is_authenticated %}
+                                    Welcome <a href="{% url 'RecipeBook:profile_detail' user.username %}">{{ user }}</a> | <a href="{% url 'RecipeBook:logout' %}">Logout</a>
+                                {% else %}
+                                    <a href="{% url 'RecipeBook:login' %}">Login</a> | <a href="{% url 'RecipeBook:create_user' %}">Create Account</a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <form action="{% url 'RecipeBook:search_results' %}" method="post" name="search" title="Search">
+                                    {% csrf_token %}
+                                    {{ search_form.as_ul }}
+                                    <input type="submit" value="search">
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </header>
+            </td>
+        </tr>
+        <tr>
+            <td style="overflow: scroll; width: 100%">
+                {% block body %}
 
-    {% block body %}
-
-    {% endblock body %}
+                {% endblock body %}
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
