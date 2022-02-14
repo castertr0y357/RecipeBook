@@ -71,45 +71,46 @@ class SearchView(SearchMixin, ListView):
         return context
 
     def get(self, request, *args, **kwargs):
-        if self.request.is_ajax():
-            name = self.request.GET.get('name')
-            sorting_method = self.request.GET.get('sorting_method')
-            ascending = self.request.GET.get('ascending')
-            data = []
-            if ascending == "true":
-                if sorting_method == "source":
-                    query = None
-                elif sorting_method == "total_time":
-                    query = Recipe.objects.filter(name__icontains=name)\
-                        .annotate(total_time=F('prep_time') + F('cook_time')).order_by('total_time')
-                else:
-                    query = Recipe.objects.filter(name__icontains=name)\
-                        .annotate(total_time=F('prep_time') + F('cook_time')).order_by(sorting_method)
-            elif ascending != "true":
-                if sorting_method == "source":
-                    query = None
-                elif sorting_method == "total_time":
-                    query = Recipe.objects.filter(name__icontains=name)\
-                        .annotate(total_time=F('prep_time') + F('cook_time')).order_by('total_time').reverse()
-                else:
-                    query = Recipe.objects.filter(name__icontains=name)\
-                        .annotate(total_time=F('prep_time') + F('cook_time')).order_by(sorting_method).reverse()
-            else:
-                query = None
-                data = serialize('json', None)
-
-            if query is not None:
-                for obj in query:
-                    url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
-                    if "http" in obj.source:
-                        source = '<a href="' + obj.source + '">' + obj.source + '</a>'
+        if hasattr(self.request, "is_ajax"):
+            if self.request.is_ajax():
+                name = self.request.GET.get('name')
+                sorting_method = self.request.GET.get('sorting_method')
+                ascending = self.request.GET.get('ascending')
+                data = []
+                if ascending == "true":
+                    if sorting_method == "source":
+                        query = None
+                    elif sorting_method == "total_time":
+                        query = Recipe.objects.filter(name__icontains=name)\
+                            .annotate(total_time=F('prep_time') + F('cook_time')).order_by('total_time')
                     else:
-                        source = obj.source
-                    json_data = {"name": url_link, "servings": obj.servings, "time": format_time(obj.total_time),
-                                 "source": source}
-                    data.append(json_data)
+                        query = Recipe.objects.filter(name__icontains=name)\
+                            .annotate(total_time=F('prep_time') + F('cook_time')).order_by(sorting_method)
+                elif ascending != "true":
+                    if sorting_method == "source":
+                        query = None
+                    elif sorting_method == "total_time":
+                        query = Recipe.objects.filter(name__icontains=name)\
+                            .annotate(total_time=F('prep_time') + F('cook_time')).order_by('total_time').reverse()
+                    else:
+                        query = Recipe.objects.filter(name__icontains=name)\
+                            .annotate(total_time=F('prep_time') + F('cook_time')).order_by(sorting_method).reverse()
+                else:
+                    query = None
+                    data = serialize('json', None)
 
-            return JsonResponse(data=data, safe=False)
+                if query is not None:
+                    for obj in query:
+                        url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
+                        if "http" in obj.source:
+                            source = '<a href="' + obj.source + '">' + obj.source + '</a>'
+                        else:
+                            source = obj.source
+                        json_data = {"name": url_link, "servings": obj.servings, "time": format_time(obj.total_time),
+                                     "source": source}
+                        data.append(json_data)
+
+                return JsonResponse(data=data, safe=False)
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
 

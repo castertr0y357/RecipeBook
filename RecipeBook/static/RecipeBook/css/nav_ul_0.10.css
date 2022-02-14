@@ -3,6 +3,10 @@
     padding: 0;
 }
 
+.nav ul {
+    display: inline-block;
+}
+
 .nav li, .drop li {
     display: inline-block;
     padding: 5px;

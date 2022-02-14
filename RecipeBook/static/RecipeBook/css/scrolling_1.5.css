@@ -3,11 +3,11 @@
     overflow-x: auto;
     scroll-margin: 0;
     max-height: 300px;
-    max-width: max-content;
+    max-width: 100%;
 }
 
 .scrolling div {
-    width: auto;
+    width: 100%;
 }
 
 .scrolling thead, th {
@@ -19,11 +19,11 @@
     overflow-y: auto;
     scroll-margin: 0;
     max-height: 80vh;
-    max-width: max-content;
+    max-width: 100%;
 }
 
 .long_scrolling div {
-    width: auto;
+    width: 100%;
 }
 
 .long_scrolling thead, th {

@@ -9,8 +9,43 @@
         <div class="long_scrolling">
             <form method="post">
                 {% csrf_token %}
-                <table style="text-align: left; padding-bottom: 10px">
-                    {{ recipe_add_form.as_table }}
+                <table class="recipe" style="text-align: left; padding-bottom: 10px; border: none">
+                    <tr>
+                        <td><b>{{ recipe_add_form.recipe_name.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.recipe_name }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{{ recipe_add_form.ingredients_list.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.ingredients_list }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{{ recipe_add_form.directions.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.directions }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{{ recipe_add_form.prep_time.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.prep_time }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{{ recipe_add_form.cook_time.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.cook_time }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{{ recipe_add_form.servings.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.servings }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{{ recipe_add_form.notes.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.notes }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{{ recipe_add_form.source.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.source }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>{{ recipe_add_form.category_input.label_tag }}</b></td>
+                        <td>{{ recipe_add_form.category_input }}</td>
+                    </tr>
                 </table>
                 <input type="submit" value="Save">
             </form>

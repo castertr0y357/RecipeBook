@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 class SearchForm(forms.Form):
     autofocus = True
     search_name = forms.CharField(widget=forms.TextInput(attrs={'size': 30, 'autofocus': autofocus,
-                                                                'placeholder': 'Ex: Chicken or Chick'}),
+                                                                'placeholder': 'Ex: Chicken or Chick',
+                                                                'class': 'nav'}),
                                   label='Search by name ',
                                   required=True,
                                   initial='',
