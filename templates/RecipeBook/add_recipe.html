@@ -9,7 +9,7 @@
         <div class="long_scrolling">
             <form method="post">
                 {% csrf_token %}
-                <table class="recipe" style="text-align: left; padding-bottom: 10px; border: none">
+                <table class="recipe" style="text-align: left; padding-bottom: 10px">
                     <tr>
                         <td><b>{{ recipe_add_form.recipe_name.label_tag }}</b></td>
                         <td>{{ recipe_add_form.recipe_name }}</td>

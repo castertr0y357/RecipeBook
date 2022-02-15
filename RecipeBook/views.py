@@ -111,6 +111,8 @@ class SearchView(SearchMixin, ListView):
                         data.append(json_data)
 
                 return JsonResponse(data=data, safe=False)
+            else:
+                return render(self.request, self.template_name, context=self.get_context_data())
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
 
@@ -255,35 +257,38 @@ class CategoryListView(SearchMixin, ListView):
         return context
 
     def get(self, request, *args, **kwargs):
-        if self.request.is_ajax():
-            sorting_method = self.request.GET.get('sorting_method')
-            ascending = self.request.GET.get('ascending')
-            query_base = Category.objects.all().annotate(recipe_count=Count('recipe'))
-            data = []
-            if ascending == "true":
-                if sorting_method == "recipe_count":
-                    query = query_base.order_by('recipe_count')
-                else:
-                    query = query_base.order_by(sorting_method)
-            elif ascending != "true":
-                if sorting_method == "recipe_count":
-                    query = query_base.order_by('recipe_count').reverse()
-                else:
-                    query = query_base.order_by(sorting_method).reverse()
-            else:
-                query = None
-                data = serialize('json', None)
-
-            if query is not None:
-                for obj in query:
-                    if obj.recipe_count > 0:
-                        url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
-                        json_data = {"name": url_link, "recipe_count": obj.recipe_count}
-                        data.append(json_data)
+        if hasattr(self.request, "is_ajax"):
+            if self.request.is_ajax():
+                sorting_method = self.request.GET.get('sorting_method')
+                ascending = self.request.GET.get('ascending')
+                query_base = Category.objects.all().annotate(recipe_count=Count('recipe'))
+                data = []
+                if ascending == "true":
+                    if sorting_method == "recipe_count":
+                        query = query_base.order_by('recipe_count')
                     else:
-                        pass
+                        query = query_base.order_by(sorting_method)
+                elif ascending != "true":
+                    if sorting_method == "recipe_count":
+                        query = query_base.order_by('recipe_count').reverse()
+                    else:
+                        query = query_base.order_by(sorting_method).reverse()
+                else:
+                    query = None
+                    data = serialize('json', None)
 
-            return JsonResponse(data=data, safe=False)
+                if query is not None:
+                    for obj in query:
+                        if obj.recipe_count > 0:
+                            url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
+                            json_data = {"name": url_link, "recipe_count": obj.recipe_count}
+                            data.append(json_data)
+                        else:
+                            pass
+
+                return JsonResponse(data=data, safe=False)
+            else:
+                return render(self.request, self.template_name, context=self.get_context_data())
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
 
@@ -309,42 +314,45 @@ class CategoryDetailView(SearchMixin, DetailView):
         return context
 
     def get(self, request, *args, **kwargs):
-        if self.request.is_ajax():
-            sorting_method = self.request.GET.get('sorting_method')
-            ascending = self.request.GET.get('ascending')
-            query_base = Recipe.objects.filter(categories=self.get_object())\
-                .annotate(total_time=F('prep_time') + F('cook_time'))
-            data = []
-            if ascending == "true":
-                if sorting_method == "source":
-                    query = None
-                elif sorting_method == "total_time":
-                    query = query_base.order_by('total_time')
-                else:
-                    query = query_base.order_by(sorting_method)
-            elif ascending != "true":
-                if sorting_method == "source":
-                    query = None
-                elif sorting_method == "total_time":
-                    query = query_base.order_by('total_time').reverse()
-                else:
-                    query = query_base.order_by(sorting_method).reverse()
-            else:
-                query = None
-                data = serialize('json', None)
-
-            if query is not None:
-                for obj in query:
-                    url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
-                    if "http" in obj.source:
-                        source = '<a href="' + obj.source + '">' + obj.source + '</a>'
+        if hasattr(self.request, "is_ajax"):
+            if self.request.is_ajax():
+                sorting_method = self.request.GET.get('sorting_method')
+                ascending = self.request.GET.get('ascending')
+                query_base = Recipe.objects.filter(categories=self.get_object())\
+                    .annotate(total_time=F('prep_time') + F('cook_time'))
+                data = []
+                if ascending == "true":
+                    if sorting_method == "source":
+                        query = None
+                    elif sorting_method == "total_time":
+                        query = query_base.order_by('total_time')
                     else:
-                        source = obj.source
-                    json_data = {"name": url_link, "servings": obj.servings, "time": format_time(obj.total_time),
-                                 "source": source}
-                    data.append(json_data)
+                        query = query_base.order_by(sorting_method)
+                elif ascending != "true":
+                    if sorting_method == "source":
+                        query = None
+                    elif sorting_method == "total_time":
+                        query = query_base.order_by('total_time').reverse()
+                    else:
+                        query = query_base.order_by(sorting_method).reverse()
+                else:
+                    query = None
+                    data = serialize('json', None)
 
-            return JsonResponse(data=data, safe=False)
+                if query is not None:
+                    for obj in query:
+                        url_link = '<a href="' + obj.get_absolute_url() + '">' + obj.name + '</a>'
+                        if "http" in obj.source:
+                            source = '<a href="' + obj.source + '">' + obj.source + '</a>'
+                        else:
+                            source = obj.source
+                        json_data = {"name": url_link, "servings": obj.servings, "time": format_time(obj.total_time),
+                                     "source": source}
+                        data.append(json_data)
+
+                return JsonResponse(data=data, safe=False)
+            else:
+                return render(self.request, self.template_name, context=self.get_context_data())
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
 
@@ -385,25 +393,28 @@ class RecipeDetailView(SearchMixin, DetailView):
         return context
 
     def get(self, request, *args, **kwargs):
-        if self.request.is_ajax():
-            resize_value = self.request.GET.get('resize_value')
-            function_type = self.request.GET.get('function_type')
-            recipe = self.get_object()
-            data = []
-            ingredients = recipe.ingredients_list.split('\n')
-            if function_type == "resize":
-                for ingredient in ingredients:
-                    parsed_value, parsed_unit, ingredient_remainder = parse_ingredient(ingredient)
-                    new_value = format_volume(parsed_value, parsed_unit, resize_value)
-                    resized_ingredient = str(new_value) + " " + str(ingredient_remainder)
-                    json_data = {"ingredient": resized_ingredient}
-                    data.append(json_data)
-            elif function_type == "reset":
-                for ingredient in ingredients:
-                    json_data = {"ingredient": ingredient}
-                    data.append(json_data)
+        if hasattr(self.request, "is_ajax"):
+            if self.request.is_ajax():
+                resize_value = self.request.GET.get('resize_value')
+                function_type = self.request.GET.get('function_type')
+                recipe = self.get_object()
+                data = []
+                ingredients = recipe.ingredients_list.split('\n')
+                if function_type == "resize":
+                    for ingredient in ingredients:
+                        parsed_value, parsed_unit, ingredient_remainder = parse_ingredient(ingredient)
+                        new_value = format_volume(parsed_value, parsed_unit, resize_value)
+                        resized_ingredient = str(new_value) + " " + str(ingredient_remainder)
+                        json_data = {"ingredient": resized_ingredient}
+                        data.append(json_data)
+                elif function_type == "reset":
+                    for ingredient in ingredients:
+                        json_data = {"ingredient": ingredient}
+                        data.append(json_data)
 
-            return JsonResponse(data=data, safe=False)
+                return JsonResponse(data=data, safe=False)
+            else:
+                return render(self.request, self.template_name, context=self.get_context_data())
         else:
             return render(self.request, self.template_name, context=self.get_context_data())
 

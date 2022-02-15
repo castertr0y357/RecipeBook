@@ -13,10 +13,14 @@
 
     {% block body %}
         {% if recipe %}
-            {% if user == recipe.submitter or user.is_superuser %}
-                <a href="{% url 'RecipeBook:edit_recipe' recipe.slug %}" style="float: right">Edit Recipe</a>
-            {% endif %}
-            <h1>{{ recipe }}</h1>
+            <table style="border: none; text-align: left">
+                <tr>
+                    <td style="border: none;"><h1>{{ recipe }}</h1></td>
+                    {% if user == recipe.submitter or user.is_superuser %}
+                        <td style="border: none"><a href="{% url 'RecipeBook:edit_recipe' recipe.slug %}">Edit Recipe</a></td>
+                    {% endif %}
+                </tr>
+            </table>
             <div id="ingredients_list">
                 <h3>Ingredients:</h3>
                 <ul id="ingredients_ul">
@@ -84,7 +88,12 @@
             </div>
             <div id="recipe sizing">
                 <form action="" method="post" name="Recipe Sizing" title="Recipe Sizing" id="recipe_sizing_form">
-                    {{ resize_form }}
+                    <table style="border: 1px black solid">
+                        <tr>
+                            <td style="border: none;">{{ resize_form.default_recipe_sizes.label_tag }}</td>
+                            <td style="border: none;">{{ resize_form.default_recipe_sizes }}</td>
+                        </tr>
+                    </table>
                     <input type="button" value="submit" id="recipe_sizing_submit">
                     <input type="reset" value="reset" id="recipe_sizing_reset">
                 </form>
