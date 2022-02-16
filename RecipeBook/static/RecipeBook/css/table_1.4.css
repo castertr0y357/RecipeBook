@@ -17,11 +17,22 @@
 
 .recipe {}
 
-.recipe tr {
-    border: 1px solid black;
+.recipe table{
     border-collapse: collapse;
 }
 
 .recipe td {
-    border: none;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-spacing: 0;
+}
+
+.recipe td:first-child {
+    border-left: 1px solid black;
+    border-right: none;
+}
+
+.recipe td:last-child {
+    border-left: none;
+    border-right: 1px solid black;
 }

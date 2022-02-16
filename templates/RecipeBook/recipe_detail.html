@@ -88,14 +88,16 @@
             </div>
             <div id="recipe sizing">
                 <form action="" method="post" name="Recipe Sizing" title="Recipe Sizing" id="recipe_sizing_form">
-                    <table style="border: 1px black solid">
+                    <table style="border: none">
                         <tr>
-                            <td style="border: none;">{{ resize_form.default_recipe_sizes.label_tag }}</td>
+                            <td style="border: none;"><b>{{ resize_form.default_recipe_sizes.label_tag }}</b></td>
                             <td style="border: none;">{{ resize_form.default_recipe_sizes }}</td>
                         </tr>
                     </table>
-                    <input type="button" value="submit" id="recipe_sizing_submit">
-                    <input type="reset" value="reset" id="recipe_sizing_reset">
+                    <div style="padding-top: 5px">
+                        <input type="button" value="submit" id="recipe_sizing_submit">
+                        <input type="reset" value="reset" id="recipe_sizing_reset">
+                    </div>
                 </form>
             </div>
         {% endif %}
