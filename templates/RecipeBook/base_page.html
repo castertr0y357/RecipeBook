@@ -6,12 +6,12 @@
     <!--Javascript files-->
     <script src="{% static "RecipeBook/jquery-3.4.1.js" %}"></script>
     <script src="{% static "RecipeBook/jquery-3.4.1.min.js" %}"></script>
-    <script src="{% static "RecipeBook/js/menu_1.4.js" %}"></script>
+    <!--<script src="{% static "RecipeBook/js/menu_1.4.js" %}"></script>-->
 
     <!--CSS files-->
     <link rel="stylesheet" href="{% static "RecipeBook/css/nav_ul_0.10.css" %}"/>
-    <link rel="stylesheet" href="{% static "RecipeBook/css/table_1.4.css" %}"/>
-    <link rel="stylesheet" href="{% static "RecipeBook/css/scrolling_1.5.css" %}"/>
+    <link rel="stylesheet" href="{% static "RecipeBook/css/table_1.5.css" %}"/>
+    <link rel="stylesheet" href="{% static "RecipeBook/css/scrolling_1.6.css" %}"/>
 
     {% block title %}
         <title>Recipe Book</title>
@@ -58,10 +58,12 @@
             </td>
         </tr>
         <tr>
-            <td style="overflow: auto; width: 100%; border: none">
-                {% block body %}
+            <td style="width: 100%; border: none">
+                <div class="container">
+                    {% block body %}
 
-                {% endblock body %}
+                    {% endblock body %}
+                </div>
             </td>
         </tr>
     </table>
