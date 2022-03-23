@@ -25,7 +25,13 @@
                 <h3>Ingredients:</h3>
                 <ul id="ingredients_ul">
                     {% for ingredient in recipe.ingredients %}
-                        <li>{{ ingredient }}</li>
+                        {% if ":" in ingredient %}
+                            <b>{{ ingredient }}</b>
+                        {% elif ingredient|length < 2 %}
+                            {{ ingredient }}
+                        {% else %}
+                            <li>{{ ingredient }}</li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>
