@@ -37,6 +37,9 @@ $(document).ready(function(){
             }
         })
     });
+    $("#ingredients_ul > li").on('click', function (){
+        $(this).toggleClass("crossed");
+    });
 });
 function replaceIngredients(ingredients_list, data) {
     ingredients_list.empty();

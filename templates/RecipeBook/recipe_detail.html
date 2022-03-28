@@ -11,6 +11,10 @@
 
     {% endblock scripts %}
 
+    {% block head %}
+        <link rel="stylesheet" href="{% static "RecipeBook/css/lists_0.1.css" %}"/>
+    {% endblock head %}
+
     {% block body %}
         {% if recipe %}
             <table style="border: none; text-align: left">
