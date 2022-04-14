@@ -14,7 +14,9 @@ $(document).ready(function(){
             success: function (data) {
                 replaceIngredients(ingredients, data);
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                let errorMessage = xhr.status + ': ' + xhr.statusText
+                console.log('Error - ' + errorMessage)
                 alert("Failed to resize ingredients.  Please check browser console (F12) for errors")
             }
         })
@@ -45,5 +47,8 @@ function replaceIngredients(ingredients_list, data) {
     ingredients_list.empty();
     $.each(data, function (index, element) {
         ingredients_list.append($('<li>').text(element.ingredient));
+    });
+    $("#ingredients_ul > li").on('click', function (){
+        $(this).toggleClass("crossed");
     });
 }
