@@ -101,14 +101,14 @@ def format_volume(volume, units, multiplier):
                 while lower_new_cups >= 1:
                     lower_whole_number += 1
                     lower_new_cups -= 1
-            if lower_whole_number > 0:
-                new_volume += str(lower_whole_number)
-            if lower_new_cups > 0:
                 if lower_whole_number > 0:
-                    new_volume += " "
-                new_volume += str(lower_new_cups)
-            if lower_whole_number > 0 or lower_new_cups > 0:
-                new_volume += "-"
+                    new_volume += str(lower_whole_number)
+                if lower_new_cups > 0:
+                    if lower_whole_number > 0:
+                        new_volume += " "
+                    new_volume += str(lower_new_cups)
+                if lower_whole_number > 0 or lower_new_cups > 0:
+                    new_volume += "-"
             if whole_number > 0:
                 if unit == "cup":
                     if whole_number > 1:
