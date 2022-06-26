@@ -1,5 +1,6 @@
 from math import floor
 from fractions import Fraction
+from decimal import Decimal
 
 
 def format_time(time_minutes):
@@ -24,7 +25,9 @@ def format_volume(volume, units, multiplier):
                  "pounds", "lbs", "pound", "lb", "fl ozs", "fl oz", "oz", "ozs", "ounce", "ounces"]
     lower_volume = None
     if volume is not None:
-        if "-" in volume:
+        if isinstance(volume, Decimal):
+            volume = Fraction(volume)
+        elif "-" in volume:
             split_volumes = volume.split("-")
             lower_volume = Fraction(split_volumes[0])
             volume = Fraction(split_volumes[1])
@@ -200,6 +203,13 @@ def parse_ingredient(ingredient):
                 value = item
             else:
                 value += (" " + item)
+        elif "." in item:
+            if value is None:
+                value = Decimal(item)
+            else:
+                ingredient_remainder += str(item)
+                if item != ingredient_listable[-1]:
+                    ingredient_remainder += " "
         elif item.isdigit():
             if value is None:
                 value = item
